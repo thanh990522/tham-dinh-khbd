@@ -1,0 +1,24 @@
+{
+  "truong": "Trường Việt Anh",
+  "khau_hieu": "Vui Vẻ & Thực Dụng",
+  "nam_hoc": "2026–2027",
+  "to_chuyen_mon_mac_dinh": "",
+  "phut_moi_tiet": 45,
+  "diem_muc_tieu": 88,
+  "so_vong_tu_sua_toi_da": 2,
+  "model": "claude-opus-5-5",
+  "effort_soan": "high",
+  "effort_cham": "medium",
+  "tra_cuu_web": true,
+  "tieu_chi_trao_quyen": {
+    "_GHI_CHU": "TẠM THỜI — Các văn bản đã cung cấp (skill + Bộ tiêu chí) chỉ ghi 'đáp ứng tối thiểu 4/6 tiêu chí trao quyền' nhưng KHÔNG liệt kê 6 tiêu chí. Danh sách dưới đây được tổng hợp từ chính các tài liệu đó (định nghĩa Trao quyền ở mục C kiến thức nền, AL7 lựa chọn/tự chủ, cơ chế LikeAbility/CrossAbility/Same-Different, công cụ lãnh đạo). Nhà trường cần THAY bằng 6 tiêu chí chính thức nếu có.",
+    "danh_sach": [
+      { "ma": "TQ-a", "ten": "HS được LỰA CHỌN thực chất (chủ đề / phương án / cấp độ nhiệm vụ)" },
+      { "ma": "TQ-b", "ten": "HS tự đặt mục tiêu hoặc lập kế hoạch thực hiện nhiệm vụ trước khi làm" },
+      { "ma": "TQ-c", "ten": "HS giữ vai trò điều phối/lãnh đạo trong nhóm (phân vai rõ, luân phiên)" },
+      { "ma": "TQ-d", "ten": "HS tự đánh giá và đánh giá đồng đẳng theo rubric công bố trước" },
+      { "ma": "TQ-e", "ten": "HS trình bày, giảng lại hoặc phản biện cho bạn (HS dạy HS)" },
+      { "ma": "TQ-f", "ten": "HS quyết định cách thức / hình thức sản phẩm / tốc độ hoàn thành" }
+    ]
+  }
+}

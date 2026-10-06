@@ -1,0 +1,454 @@
+{
+  "meta": {
+    "truong": "Trường Việt Anh",
+    "to_chuyen_mon": "Ngoại ngữ",
+    "giao_vien": "",
+    "mon_hoc": "Tiếng Anh",
+    "lop": "7",
+    "ten_bai": "Unit 2: Healthy living – Lesson 1: Getting started – Let's go out!",
+    "bo_sach": "Tiếng Anh 7 Global Success (Kết nối tri thức với cuộc sống)",
+    "tiet_ppct": "",
+    "so_tiet": 1,
+    "tuan": "",
+    "phuong_phap": "SD",
+    "ly_do_chon_phuong_phap": "Bài tập 5 (khảo sát hoạt động tốt/không tốt cho sức khoẻ) mở ra nhiều cách 'sống khoẻ' khác nhau. Mỗi nhóm chọn 1 trong 3 phương án kế hoạch sống khoẻ theo sở thích, dùng từ vựng của bài để hoàn thiện, rồi cả lớp so sánh điểm giống/khác giữa các phương án — đúng cơ chế Same/Different: HS vận dụng kiến thức giải quyết vấn đề và được chọn phương án.",
+    "su_dung_ai": false,
+    "ngon_ngu_noi_dung": "Tiếng Việt cho phần tổ chức; tiếng Anh cho ngữ liệu, câu hỏi, đáp án"
+  },
+  "can_cu_chuong_trinh": {
+    "yeu_cau_can_dat": [
+      "Nghe – đọc hiểu đoạn hội thoại ngắn về chủ đề Healthy living (Getting started, tr.18).",
+      "Hiểu và sử dụng từ vựng về hoạt động có lợi/có hại cho sức khoẻ (sunburn, suncream, lunch box, boating, cycling, countryside, popular, fresh, join).",
+      "Hỏi – đáp và nói ngắn về các hoạt động hằng ngày, đánh giá hoạt động tốt hay không tốt cho sức khoẻ."
+    ],
+    "noi_dung_sgk_tom_tat": "Getting started – Let's go out! (SGK Tiếng Anh 7 Global Success, Unit 2): Bài 1 Listen and read (tr.18) – hội thoại giữa Mi và Mark; Bài 2 (tr.19) – chọn đáp án đúng về nội dung hội thoại (đáp án B theo bản gốc); Bài 3 (tr.19) – viết từ/cụm từ dưới tranh: sunburn, suncream, lunch box, boating, cycling; Bài 4 (tr.19) – hoàn thành câu bằng từ trong hội thoại: boating, park, countryside, suncream, health; Bài 5 (tr.19) – hoạt động Good or bad for health.",
+    "nguon_tham_khao": [
+      "KHBD gốc của giáo viên: TA7-Unit 2 (Lesson 1 – Getting started)",
+      "https://loigiaihay.com/unit-2-healthy-living-e25352.html (danh mục bài tập Getting started)"
+    ],
+    "la_bai_mo_rong": false,
+    "ghi_chu_can_kiem_tra": [
+      "Yêu cầu cần đạt ở trên được viết từ mục tiêu bản gốc + nội dung SGK; chưa đối chiếu được văn bản PPCT/Phụ lục 1 chính thức của trường — GV kiểm tra lại.",
+      "Nguồn tra cứu mô tả Bài 5 là trò chơi 'Good/bad for health?', bản gốc ghi 'Survey' — GV đối chiếu hình thức Bài 5 trong SGK tr.19.",
+      "Nội dung phương án B của Bài 2 lấy theo đáp án bản gốc — GV đối chiếu SGK tr.19."
+    ]
+  },
+  "muc_tieu": {
+    "kien_thuc": [
+      { "id": "KT1", "noi_dung": "HS hiểu nghĩa, phát âm đúng và dùng được trong câu ít nhất 6 từ/cụm từ của bài: popular, fresh, join, sunburn, suncream, lunch box, boating, cycling, countryside." },
+      { "id": "KT2", "noi_dung": "HS nhận biết và nói được về các hoạt động hằng ngày, xác định hoạt động nào tốt/không tốt cho sức khoẻ và giải thích ngắn gọn lý do." }
+    ],
+    "nang_luc_chung": [
+      { "id": "NLC1", "noi_dung": "Giao tiếp và hợp tác: làm việc cặp/nhóm theo vai được phân công, hoàn thành sản phẩm nhóm đúng thời gian, lắng nghe và phản hồi ý kiến của bạn." },
+      { "id": "NLC2", "noi_dung": "Giải quyết vấn đề và sáng tạo: chọn một phương án kế hoạch sống khoẻ và đề xuất ít nhất 3 lời khuyên phù hợp với kết quả khảo sát của nhóm." }
+    ],
+    "nang_luc_dac_thu": [
+      { "id": "NLDT1", "noi_dung": "Nghe – đọc: nghe và đọc hội thoại Bài 1, trả lời đúng câu hỏi Bài 2 và ít nhất 8/10 câu của Bài 3–4." },
+      { "id": "NLDT2", "noi_dung": "Nói: hỏi – đáp khảo sát (How often do you…? Is it good or bad for your health? Why?) và trình bày kế hoạch của nhóm trong khoảng 1 phút bằng tiếng Anh." }
+    ],
+    "pham_chat": [
+      { "id": "PC1", "noi_dung": "Chăm chỉ: tích cực tham gia các hoạt động học, có ý thức rèn luyện thói quen sống lành mạnh hằng ngày." }
+    ],
+    "tlim": [
+      {
+        "id": "TL1",
+        "thoi_quen_so": 3,
+        "ten_thoi_quen": "Ưu tiên điều quan trọng",
+        "cong_cu": "Công cụ Ưu tiên kết hợp ẩn dụ \"Hòn đá lớn\"",
+        "hanh_vi_quan_sat": "Nhóm xếp hạng các lời khuyên sống khoẻ theo mức độ quan trọng, chọn 1 \"hòn đá lớn\" đặt đầu poster và giải thích vì sao ưu tiên."
+      }
+    ],
+    "trao_quyen": [
+      { "id": "TQ1", "noi_dung": "Nhóm tự chọn 1 trong 3 phương án kế hoạch sống khoẻ và tự quyết định cách trình bày poster (bảng, sơ đồ, tranh vẽ).", "tieu_chi_dap_ung": ["TQ-a", "TQ-f"] },
+      { "id": "TQ2", "noi_dung": "HS giữ vai trò điều phối (Leader) và cùng nhóm lập thứ tự công việc trước khi bắt tay làm sản phẩm.", "tieu_chi_dap_ung": ["TQ-c", "TQ-b"] },
+      { "id": "TQ3", "noi_dung": "HS tự đánh giá và đánh giá chéo poster theo rubric R1; Reporter của nhóm trình bày và trả lời câu hỏi của bạn.", "tieu_chi_dap_ung": ["TQ-d", "TQ-e"] }
+    ],
+    "gia_tri_cot_loi": [
+      {
+        "id": "GT1",
+        "gia_tri_so": 2,
+        "ten_gia_tri": "Trách nhiệm",
+        "cap_bac": "Phát triển",
+        "hanh_vi_quan_sat": "Mỗi thành viên hoàn thành đúng phần việc của vai mình (ghi tên + phần việc trên poster) và cam kết 1 hành động giữ gìn sức khoẻ của bản thân."
+      }
+    ]
+  },
+  "thiet_bi_hoc_lieu": [
+    { "ten": "SGK Tiếng Anh 7 Global Success – Unit 2, Getting started (tr.18–19)", "doi_tuong": "HS", "dung_cho_hoat_dong": ["HD2", "HD3", "HD4", "HD5"] },
+    { "ten": "File nghe Unit 2 – Getting started (sachmem.vn), máy tính kết nối Internet, loa", "doi_tuong": "GV", "dung_cho_hoat_dong": ["HD2"] },
+    { "ten": "Máy chiếu/TV, tranh minh hoạ và thẻ từ: popular, fresh, join", "doi_tuong": "GV", "dung_cho_hoat_dong": ["HD1", "HD2"] },
+    { "ten": "Bảng con (mini-board) và bút lông cho mỗi cặp", "doi_tuong": "HS", "dung_cho_hoat_dong": ["HD2", "HD3"] },
+    { "ten": "Phiếu khảo sát Bài 5 (Activity – How often – Good/Bad – Why) và thẻ vai trò nhóm", "doi_tuong": "HS", "dung_cho_hoat_dong": ["HD5"] },
+    { "ten": "Giấy A3, bút màu cho poster nhóm; rubric R1 in sẵn mỗi nhóm 1 bản", "doi_tuong": "HS", "dung_cho_hoat_dong": ["HD1", "HD5", "HD6"] },
+    { "ten": "Khung Sơ đồ Venn 3 vòng vẽ sẵn trên bảng lớp", "doi_tuong": "GV", "dung_cho_hoat_dong": ["HD6"] }
+  ],
+  "ung_dung_ai": {
+    "giao_vien": [],
+    "hoc_sinh_duoc_dung": false,
+    "nhiem_vu_hs_duoc_dung": [],
+    "gioi_han": "",
+    "khau_bat_buoc_tu_lam": [],
+    "luu_dau_vet": "",
+    "danh_gia_phan_biet": ""
+  },
+  "rubric": [
+    {
+      "id": "R1",
+      "ten": "Poster \"Our healthy living plan\" và phần trình bày của nhóm",
+      "loai": "san_pham",
+      "ap_dung_cho": ["HD5", "HD6"],
+      "thoi_diem_cong_bo": "Công bố cho HS đầu tiết (HD1) và phát bản in khi giao nhiệm vụ HD5",
+      "tieu_chi": [
+        { "ten": "Ngôn ngữ (Language)", "tot": "Dùng đúng ≥5 từ/cụm từ của bài; câu đúng ngữ pháp, dễ hiểu.", "dat": "Dùng đúng 3–4 từ/cụm từ; còn 1–2 lỗi nhỏ không gây hiểu sai.", "chua_dat": "Dùng ≤2 từ của bài hoặc nhiều lỗi gây khó hiểu.", "lien_ket_muc_tieu": ["KT1", "NLDT2"] },
+        { "ten": "Nội dung kế hoạch (Content)", "tot": "≥3 lời khuyên phù hợp với kết quả khảo sát, mỗi lời khuyên có lý do (because…).", "dat": "2–3 lời khuyên, có lý do cho ít nhất 1 lời khuyên.", "chua_dat": "Dưới 2 lời khuyên hoặc không liên quan kết quả khảo sát.", "lien_ket_muc_tieu": ["KT2", "NLC2"] },
+        { "ten": "Ưu tiên điều quan trọng (Thói quen 3)", "tot": "Có xếp hạng các lời khuyên, chọn rõ 1 \"hòn đá lớn\" và giải thích vì sao quan trọng nhất.", "dat": "Có xếp hạng nhưng chưa giải thích lựa chọn \"hòn đá lớn\".", "chua_dat": "Không xếp hạng/không xác định điều quan trọng nhất.", "lien_ket_muc_tieu": ["TL1"] },
+        { "ten": "Trách nhiệm & hợp tác (Giá trị 2)", "tot": "Mọi thành viên làm đúng vai, phần việc ghi tên rõ trên poster; nộp đúng giờ.", "dat": "Đa số thành viên làm đúng vai; trễ dưới 1 phút.", "chua_dat": "Có thành viên không có phần việc hoặc nhóm không hoàn thành.", "lien_ket_muc_tieu": ["GT1", "NLC1"] },
+        { "ten": "Trình bày (Presentation)", "tot": "Reporter nói khoảng 1 phút, rõ ràng, trả lời được câu hỏi của bạn.", "dat": "Nói rõ nhưng dưới 1 phút hoặc cần GV gợi ý khi trả lời câu hỏi.", "chua_dat": "Đọc nguyên văn, khó nghe, không trả lời được câu hỏi.", "lien_ket_muc_tieu": ["NLDT2"] }
+      ]
+    }
+  ],
+  "bo_cau_hoi_dinh_huong": {
+    "mo_ta": "Bộ câu hỏi định hướng theo khung Same/Different: câu hỏi khảo sát chung, định hướng riêng cho từng phương án, và câu hỏi so sánh giống/khác giữa các phương án.",
+    "nhom": [
+      {
+        "ten_nhom": "Câu hỏi khảo sát chung (Bài 5)",
+        "cau_hoi": [
+          { "hoi": "What do you usually do every day / at the weekend?", "goi_y_dap_an": "I walk to school. / I go swimming. / I play computer games." },
+          { "hoi": "How often do you do it?", "goi_y_dap_an": "Every day / twice a week / three times a week / rarely." },
+          { "hoi": "Is it good or bad for your health? Why?", "goi_y_dap_an": "It's good because it makes me strong. / It's bad because I sleep too much (12 hours per day)." }
+        ]
+      },
+      {
+        "ten_nhom": "Phương án 1 – Healthy outdoor weekend",
+        "cau_hoi": [
+          { "hoi": "Which outdoor activities from the conversation can your group do at the weekend?", "goi_y_dap_an": "Boating, cycling, going to the park or the countryside." },
+          { "hoi": "What do you need to take to avoid sunburn?", "goi_y_dap_an": "Suncream (and a hat)." },
+          { "hoi": "What should we bring if we stay outdoors all day?", "goi_y_dap_an": "A lunch box with fresh food and water." }
+        ]
+      },
+      {
+        "ten_nhom": "Phương án 2 – Healthy eating day",
+        "cau_hoi": [
+          { "hoi": "How often do the members of your group eat breakfast?", "goi_y_dap_an": "Theo kết quả khảo sát của nhóm (vd: Nam rarely eats breakfast – bad for health)." },
+          { "hoi": "Why is fresh food good for our health?", "goi_y_dap_an": "Because it has a lot of vitamins / it is clean and healthy." },
+          { "hoi": "What can you put in a healthy lunch box?", "goi_y_dap_an": "Rice, fresh vegetables, fruit, water…" }
+        ]
+      },
+      {
+        "ten_nhom": "Phương án 3 – Healthy sleep & screen time",
+        "cau_hoi": [
+          { "hoi": "How many hours do the members of your group sleep a day?", "goi_y_dap_an": "Theo kết quả khảo sát (vd: 8 hours – good; 12 hours – too much)." },
+          { "hoi": "Is sleeping 12 hours a day good or bad for health? Why?", "goi_y_dap_an": "Bad, because we don't have time to do exercise / it makes us lazy." },
+          { "hoi": "What can you do instead of playing computer games for a long time?", "goi_y_dap_an": "Join a club, go cycling, play sports, do yoga." }
+        ]
+      },
+      {
+        "ten_nhom": "Câu hỏi so sánh Same / Different (HD6)",
+        "cau_hoi": [
+          { "hoi": "What is the SAME in all three plans?", "goi_y_dap_an": "All plans help us stay healthy; all need us to change daily habits; all use words from the lesson." },
+          { "hoi": "What is DIFFERENT between the plans?", "goi_y_dap_an": "Plan 1 focuses on outdoor activities, Plan 2 on food, Plan 3 on sleep and screen time; they need different things (suncream, lunch box, a timetable)." },
+          { "hoi": "Which plan is the easiest for you to follow this week? Why?", "goi_y_dap_an": "Câu trả lời cá nhân, có lý do (because…)." }
+        ]
+      }
+    ]
+  },
+  "dac_thu_phuong_phap": {
+    "praad": {
+      "muc_dich_loai": "",
+      "muc_dich": "",
+      "tieu_chi": [],
+      "gia_dinh": [],
+      "khia_canh": [],
+      "gia_thuyet_minh_chung": [],
+      "do_tin_cay_nguon": "",
+      "quyet_dinh": ""
+    },
+    "cap_do_likeability": [],
+    "chu_de_crossability": [],
+    "phuong_an_same_different": [
+      { "ten": "PA1 – Healthy outdoor weekend", "dinh_huong": "Lập kế hoạch 1 cuối tuần vận động ngoài trời cho nhóm: chọn hoạt động (boating, cycling, park, countryside), đồ cần mang (suncream, lunch box) và lý do mỗi lựa chọn tốt cho sức khoẻ.", "tai_lieu": "Hội thoại Bài 1 tr.18; tranh Bài 3 tr.19" },
+      { "ten": "PA2 – Healthy eating day", "dinh_huong": "Dựa trên kết quả khảo sát về bữa sáng/đồ ăn, đề xuất thực đơn 1 ngày ăn uống lành mạnh (breakfast, fresh food, lunch box) và lý do.", "tai_lieu": "Hội thoại Bài 1; phiếu khảo sát Bài 5" },
+      { "ten": "PA3 – Healthy sleep & screen time", "dinh_huong": "Dựa trên kết quả khảo sát về giờ ngủ/thời gian dùng thiết bị, đề xuất thời gian biểu ngủ – nghỉ – vận động hợp lý và lý do.", "tai_lieu": "Phiếu khảo sát Bài 5; ví dụ 'Sleeping 12 hours per day' trong bản gốc" }
+    ],
+    "hinh_thuc_same_different": "Hình thức 2: mỗi nhóm thảo luận và thống nhất chọn 1 phương án chung (mỗi phương án tối thiểu 1 nhóm; GV điều phối nếu cả lớp dồn vào 1 phương án).",
+    "yeu_cau_so_sanh": "Sau khi các nhóm trình bày, cả lớp điền Sơ đồ Venn 3 vòng trên bảng: ghi điểm GIỐNG (vùng giao) và KHÁC (vùng riêng) giữa 3 phương án; mỗi HS chọn phương án mình sẽ thực hiện trong tuần và giải thích vì sao."
+  },
+  "hoat_dong": [
+    {
+      "id": "HD1",
+      "ten": "Warm-up: HEALTH word race & Làm rõ kỳ vọng",
+      "loai": "khoi_dong",
+      "buoc_4pp": "lam_ro_ky_vong",
+      "thoi_gian_phut": 4,
+      "phut_gv_thuyet_giang": 2,
+      "muc_tieu_ids": ["KT2", "NLC1"],
+      "muc_tieu_hoat_dong": "Kích hoạt vốn từ về sức khoẻ, tạo không khí học tập; HS nắm rõ mục tiêu, nhiệm vụ cuối bài (3 phương án) và rubric R1.",
+      "noi_dung": "Hai đội thi viết nhanh lên bảng các từ liên quan đến \"HEALTH\" (vd: strong, weak, sick, ill…). Sau đó HS trả lời câu hỏi \"What should we do to be stronger?\" và nghe GV giới thiệu mục tiêu bài, 3 phương án kế hoạch sống khoẻ và rubric R1.",
+      "san_pham": "Bảng từ vựng của 2 đội (đội nhiều từ đúng thắng); HS nêu được ít nhất 3 cách để khoẻ mạnh hơn và biết tiêu chí rubric R1 của sản phẩm cuối bài.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV viết \"HEALTH\" lên bảng, chia lớp 2 đội, nêu luật: lần lượt từng HS lên viết 1 từ, 90 giây.",
+        "thuc_hien_nhiem_vu": "HS mỗi đội luân phiên lên bảng viết từ; HS dưới lớp nhắc từ cho bạn bằng tiếng Anh.",
+        "bao_cao_thao_luan": "HS đội bạn kiểm tra chính tả, phát âm; cả lớp trả lời nhanh \"What should we do to be stronger?\".",
+        "ket_luan_nhan_dinh": "GV công bố đội thắng, dẫn vào chủ đề Healthy living; chiếu mục tiêu bài, 3 phương án nhiệm vụ cuối bài và rubric R1."
+      },
+      "hinh_thuc": "nhom",
+      "phan_vai": [
+        { "vai": "Writer (luân phiên)", "nhiem_vu": "Lên bảng viết 1 từ rồi chuyển bút cho bạn kế tiếp." },
+        { "vai": "Checker", "nhiem_vu": "Kiểm tra chính tả từ của đội bạn khi hết giờ." }
+      ],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "active",
+      "muc_bloom": "nho",
+      "ho_tro_hs": "HS yếu được nhắc từ bằng tranh gợi ý trên màn chiếu; đồng đội được phép gợi ý chữ cái đầu.",
+      "tlim_ids": [],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": [],
+      "rubric_ids": ["R1"],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD2",
+      "ten": "Presentation: Vocabulary + Listen and read (Bài 1, tr.18)",
+      "loai": "hinh_thanh_kien_thuc",
+      "buoc_4pp": "thuc_hanh",
+      "thoi_gian_phut": 8,
+      "phut_gv_thuyet_giang": 3,
+      "muc_tieu_ids": ["KT1", "NLDT1"],
+      "muc_tieu_hoat_dong": "HS hiểu nghĩa, phát âm đúng popular, fresh, join; nghe – đọc hội thoại giữa Mi và Mark, gạch chân từ về Healthy living.",
+      "noi_dung": "HS đoán nghĩa từ qua tranh/từ trái nghĩa/định nghĩa (popular – antonym; fresh – definition + picture; join – synonym + picture), đọc đồng thanh – cá nhân; theo cặp trả lời 4 câu hỏi về tranh (Who are they? What might they talk about? What are the people in the picture on the wall doing? Are they healthy activities?), rồi nghe – đọc Bài 1 để kiểm tra và gạch chân từ về sức khoẻ.",
+      "san_pham": "Câu trả lời của cặp: 1. They are Mi and Mark. 2. They are looking at the picture on the wall and talking about it. 3. They are exercising, boating, etc. 4. (HS tự trả lời có lý do). Bảng con ghi đúng nghĩa 3 từ mới; SGK có gạch chân các từ về Healthy living.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV chiếu tranh minh hoạ từng từ, yêu cầu cặp đoán nghĩa và ghi lên bảng con; giao 4 câu hỏi về tranh tr.18.",
+        "thuc_hien_nhiem_vu": "HS theo cặp đoán nghĩa, luyện phát âm; HS thảo luận 4 câu hỏi; HS nghe – đọc hội thoại (GV mở file nghe 1–2 lần) và gạch chân từ.",
+        "bao_cao_thao_luan": "Các cặp giơ bảng con (Show me!) trả lời câu hỏi kiểm tra khái niệm; 2–3 cặp đọc phân vai hội thoại; cả lớp đối chiếu câu trả lời.",
+        "ket_luan_nhan_dinh": "GV chốt nghĩa – phát âm 3 từ, xác nhận đáp án 4 câu hỏi, sửa lỗi phát âm phổ biến."
+      },
+      "hinh_thuc": "cap_doi",
+      "phan_vai": [
+        { "vai": "Student A", "nhiem_vu": "Ghi đáp án lên bảng con, đọc vai Mi." },
+        { "vai": "Student B", "nhiem_vu": "Tìm minh chứng trong hội thoại, đọc vai Mark." }
+      ],
+      "kiem_tra_hieu_bai": { "co": true, "cong_cu": "Bảng con – 3 câu hỏi kiểm tra khái niệm (CCQ): Is 'popular' liked by many people or few people? Is fresh food new or old? If you join a club, are you a member?", "cach_dieu_chinh": "Nếu dưới 2/3 số cặp đúng, GV cho thêm ví dụ trong ngữ cảnh lớp học và hỏi lại trước khi chuyển hoạt động." },
+      "muc_icap": "active",
+      "muc_bloom": "hieu",
+      "ho_tro_hs": "Hiển thị tranh + nghĩa tiếng Việt cho HS yếu; mở file nghe thêm lần nữa theo nhu cầu; cặp có HS khá – yếu hỗ trợ nhau.",
+      "tlim_ids": [],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": [],
+      "rubric_ids": [],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD3",
+      "ten": "Practice 1: Bài 2 & Bài 3 (tr.19)",
+      "loai": "luyen_tap",
+      "buoc_4pp": "thuc_hanh",
+      "thoi_gian_phut": 7,
+      "phut_gv_thuyet_giang": 1,
+      "muc_tieu_ids": ["NLDT1", "KT1"],
+      "muc_tieu_hoat_dong": "HS hiểu ý chính hội thoại (Bài 2) và nhận diện từ vựng qua tranh (Bài 3).",
+      "noi_dung": "Bài 2: HS chọn đáp án đúng về nội dung hội thoại mà không đọc lại, giải thích vì sao loại 2 phương án còn lại. Bài 3: HS viết từ/cụm từ trong khung dưới mỗi tranh.",
+      "san_pham": "Bài 2: đáp án B, kèm 1 câu giải thích. Bài 3: 1. sunburn 2. suncream 3. lunch box 4. boating 5. cycling (ghi trên bảng con và SGK).",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV nêu yêu cầu 2 bài, giới hạn thời gian 3 phút/bài.",
+        "thuc_hien_nhiem_vu": "HS làm cá nhân Bài 2 rồi so đáp án với bạn cùng cặp, nêu lý do loại phương án; HS làm Bài 3 cá nhân, cặp kiểm tra chéo chính tả.",
+        "bao_cao_thao_luan": "Bài 2: 2 HS giải thích vì sao không chọn 2 phương án còn lại. Bài 3: cả lớp giơ bảng con đồng loạt từng tranh.",
+        "ket_luan_nhan_dinh": "GV xác nhận đáp án, ghi từ lên bảng, nhấn mạnh phát âm suncream /ˈsʌnkriːm/ và sunburn."
+      },
+      "hinh_thuc": "cap_doi",
+      "phan_vai": [
+        { "vai": "Checker", "nhiem_vu": "So đáp án của bạn với của mình, đánh dấu câu khác nhau để thảo luận." },
+        { "vai": "Explainer", "nhiem_vu": "Giải thích lý do chọn đáp án bằng câu trong hội thoại." }
+      ],
+      "kiem_tra_hieu_bai": { "co": true, "cong_cu": "Bảng con đồng loạt (Show me!) cho 5 tranh Bài 3", "cach_dieu_chinh": "Từ nào sai ở >1/3 lớp: GV cho HS tìm lại câu chứa từ đó trong hội thoại và luyện phát âm lại ngay." },
+      "muc_icap": "active",
+      "muc_bloom": "hieu",
+      "ho_tro_hs": "HS gặp khó được xem lại hội thoại khi làm Bài 3; bạn Explainer hỗ trợ giải thích.",
+      "tlim_ids": [],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": [],
+      "rubric_ids": [],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD4",
+      "ten": "Practice 2: Bài 4 – Complete the sentences (tr.19)",
+      "loai": "luyen_tap",
+      "buoc_4pp": "thuc_hanh",
+      "thoi_gian_phut": 4,
+      "phut_gv_thuyet_giang": 0,
+      "muc_tieu_ids": ["KT1", "NLDT1"],
+      "muc_tieu_hoat_dong": "HS sử dụng từ trong ngữ cảnh câu.",
+      "noi_dung": "HS hoàn thành 5 câu bằng từ trong hội thoại và chỉ ra vị trí từ đó trong bài đọc.",
+      "san_pham": "Đáp án: 1. boating 2. park 3. countryside 4. suncream 5. health — mỗi đáp án kèm dòng tìm thấy trong hội thoại.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV yêu cầu HS làm cá nhân trong 2 phút, sau đó đổi vở với bạn.",
+        "thuc_hien_nhiem_vu": "HS làm cá nhân, sau đó chấm chéo cho bạn theo đáp án chiếu trên màn hình.",
+        "bao_cao_thao_luan": "HS báo cáo số câu đúng bằng giơ tay (5/5, 4/5…); HS chỉ ra câu trong hội thoại chứa đáp án.",
+        "ket_luan_nhan_dinh": "GV chốt đáp án, lưu ý câu nhiều HS sai."
+      },
+      "hinh_thuc": "ca_nhan",
+      "phan_vai": [],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "active",
+      "muc_bloom": "van_dung",
+      "ho_tro_hs": "HS yếu được gợi ý chữ cái đầu của từ cần điền.",
+      "tlim_ids": [],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": [],
+      "rubric_ids": [],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD5",
+      "ten": "Production (Same/Different): Survey & Our healthy living plan (Bài 5, tr.19)",
+      "loai": "van_dung",
+      "buoc_4pp": "thuc_hanh",
+      "thoi_gian_phut": 11,
+      "phut_gv_thuyet_giang": 1,
+      "muc_tieu_ids": ["KT1", "KT2", "NLC1", "NLC2", "NLDT2", "PC1"],
+      "muc_tieu_hoat_dong": "HS khảo sát hoạt động hằng ngày của các thành viên, đánh giá tốt/không tốt cho sức khoẻ, chọn 1 phương án và xây kế hoạch sống khoẻ có xếp hạng ưu tiên.",
+      "noi_dung": "Nhóm 4 HS: (1) phỏng vấn nhau theo phiếu khảo sát Bài 5 (Activity – How often – Good/Bad – Why); (2) thống nhất chọn 1 trong 3 phương án (PA1 Healthy outdoor weekend / PA2 Healthy eating day / PA3 Healthy sleep & screen time) và lập thứ tự công việc; (3) đề xuất ≥3 lời khuyên dùng từ vựng của bài; (4) dùng Công cụ Ưu tiên xếp hạng lời khuyên, chọn 1 \"hòn đá lớn\"; (5) làm poster A3, mỗi thành viên ghi tên cạnh phần việc của mình.",
+      "san_pham": "Phiếu khảo sát 4 thành viên (vd: Walking to school – every day – good; Eating breakfast – rarely – bad; Sleeping – 12 hours per day – bad) và poster \"Our healthy living plan\" gồm ≥3 lời khuyên có lý do, 1 \"hòn đá lớn\" được xếp đầu, tên + phần việc từng thành viên; tự đánh giá theo rubric R1.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV phát phiếu khảo sát, thẻ vai trò và rubric R1; nhắc lại 3 phương án và câu hỏi định hướng của từng phương án (chiếu trên màn hình).",
+        "thuc_hien_nhiem_vu": "HS phỏng vấn nhau, nhóm chọn phương án, Leader điều phối lập thứ tự việc, cả nhóm viết lời khuyên, xếp hạng ưu tiên và làm poster; GV đi quanh quan sát, hỗ trợ nhóm gặp khó, nhắc giờ ở mốc còn 2 phút.",
+        "bao_cao_thao_luan": "Nhóm tự chấm sơ bộ poster theo rubric R1 trước khi trưng bày (chuẩn bị cho HD6).",
+        "ket_luan_nhan_dinh": "GV ghi nhận nhanh tiến độ các nhóm, nhắc nhóm chưa có \"hòn đá lớn\" bổ sung trước khi trình bày."
+      },
+      "hinh_thuc": "nhom",
+      "phan_vai": [
+        { "vai": "Leader (điều phối)", "nhiem_vu": "Điều phối nhóm chọn phương án, lập thứ tự công việc, giữ cả nhóm đúng nhiệm vụ." },
+        { "vai": "Interviewer & Timekeeper", "nhiem_vu": "Hỏi các câu hỏi khảo sát, nhắc giờ theo từng bước." },
+        { "vai": "Recorder", "nhiem_vu": "Ghi kết quả khảo sát và lời khuyên lên poster." },
+        { "vai": "Reporter", "nhiem_vu": "Chuẩn bị và trình bày kế hoạch của nhóm trong 1 phút ở HD6." }
+      ],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "interactive",
+      "muc_bloom": "sang_tao",
+      "ho_tro_hs": "Khung câu gợi ý trên màn chiếu: \"We should … because …\", \"The most important thing is … because …\"; GV hỗ trợ trực tiếp nhóm chậm; HS khá trong nhóm giúp bạn diễn đạt.",
+      "tlim_ids": ["TL1"],
+      "gia_tri_ids": ["GT1"],
+      "trao_quyen_ids": ["TQ1", "TQ2"],
+      "rubric_ids": ["R1"],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD6",
+      "ten": "Report & Compare: Same / Different",
+      "loai": "van_dung",
+      "buoc_4pp": "bao_cao_danh_gia",
+      "thoi_gian_phut": 5,
+      "phut_gv_thuyet_giang": 1,
+      "muc_tieu_ids": ["NLDT2", "NLC1", "KT2"],
+      "muc_tieu_hoat_dong": "HS trình bày kế hoạch, đánh giá chéo theo rubric và so sánh điểm giống/khác giữa các phương án.",
+      "noi_dung": "Reporter mỗi nhóm trình bày 1 phút; nhóm khác đặt 1 câu hỏi và chấm chéo theo R1; cả lớp điền Sơ đồ Venn 3 vòng (giống/khác giữa 3 phương án) trên bảng.",
+      "san_pham": "Phiếu chấm chéo R1 của từng nhóm; Sơ đồ Venn trên bảng nêu ≥2 điểm giống và ≥3 điểm khác giữa 3 phương án (vd giống: đều giúp khoẻ mạnh, cần thay đổi thói quen hằng ngày; khác: vận động ngoài trời / ăn uống / giấc ngủ – thiết bị).",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV mời Reporter của các nhóm lần lượt trình bày, phân công nhóm chấm chéo (nhóm 1 chấm nhóm 2…).",
+        "thuc_hien_nhiem_vu": "HS Reporter trình bày; HS nhóm chấm chéo lắng nghe, đặt câu hỏi, ghi điểm R1; HS lên bảng điền ý vào Sơ đồ Venn.",
+        "bao_cao_thao_luan": "Cả lớp thảo luận câu hỏi so sánh Same/Different; mỗi HS chọn phương án mình sẽ làm trong tuần.",
+        "ket_luan_nhan_dinh": "GV nhận xét theo rubric, khen nhóm có \"hòn đá lớn\" thuyết phục, chốt điểm giống/khác."
+      },
+      "hinh_thuc": "nhom",
+      "phan_vai": [
+        { "vai": "Reporter", "nhiem_vu": "Trình bày kế hoạch và trả lời câu hỏi." },
+        { "vai": "Assessors (các thành viên còn lại)", "nhiem_vu": "Đặt 1 câu hỏi và chấm chéo nhóm bạn theo R1." }
+      ],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "interactive",
+      "muc_bloom": "danh_gia",
+      "ho_tro_hs": "Reporter được dùng poster làm điểm tựa; GV gợi ý câu hỏi mẫu cho nhóm chấm chéo (Why is … your big rock?).",
+      "tlim_ids": ["TL1"],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": ["TQ3"],
+      "rubric_ids": ["R1"],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    },
+    {
+      "id": "HD7",
+      "ten": "Chiêm nghiệm (Reflection)",
+      "loai": "chiem_nghiem",
+      "buoc_4pp": "chiem_nghiem",
+      "thoi_gian_phut": 3,
+      "phut_gv_thuyet_giang": 1,
+      "muc_tieu_ids": ["PC1"],
+      "muc_tieu_hoat_dong": "GV và HS phản tư quá trình học: khó khăn, cách khắc phục, điều học được; liên hệ Thói quen 3 và giá trị Trách nhiệm.",
+      "noi_dung": "HS trả lời 3 câu hỏi chiêm nghiệm vào vở (1–2 câu/ý), 2–3 HS chia sẻ; GV chia sẻ điều GV rút ra về cách tổ chức hoạt động nhóm.",
+      "san_pham": "Ghi chép chiêm nghiệm của từng HS (3 ý) và cam kết 1 hành động sống khoẻ trong tuần.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV chiếu 3 câu hỏi chiêm nghiệm.",
+        "thuc_hien_nhiem_vu": "HS tự viết câu trả lời cá nhân.",
+        "bao_cao_thao_luan": "2–3 HS chia sẻ trước lớp; bạn khác bổ sung.",
+        "ket_luan_nhan_dinh": "GV ghi nhận, chia sẻ phản tư của GV về tiết học."
+      },
+      "hinh_thuc": "ca_nhan",
+      "phan_vai": [],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "constructive",
+      "muc_bloom": "danh_gia",
+      "ho_tro_hs": "Cho phép HS viết bằng tiếng Việt nếu chưa diễn đạt được bằng tiếng Anh.",
+      "tlim_ids": ["TL1"],
+      "gia_tri_ids": ["GT1"],
+      "trao_quyen_ids": [],
+      "rubric_ids": [],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": [
+        { "hoi": "Hôm nay em gặp khó khăn gì khi dùng từ mới để đưa ra lời khuyên? Em đã khắc phục thế nào?", "cham_vao_ids": [] },
+        { "hoi": "\"Hòn đá lớn\" về sức khoẻ em sẽ đặt lên đầu trong tuần này là gì? Vì sao nó quan trọng hơn những việc khác?", "cham_vao_ids": ["TL1"] },
+        { "hoi": "Trong nhóm hôm nay em đã chịu trách nhiệm phần việc nào, và em có trách nhiệm gì với sức khoẻ của chính mình?", "cham_vao_ids": ["GT1"] }
+      ]
+    },
+    {
+      "id": "HD8",
+      "ten": "Củng cố & giao nhiệm vụ về nhà",
+      "loai": "cung_co",
+      "buoc_4pp": "cung_co",
+      "thoi_gian_phut": 3,
+      "phut_gv_thuyet_giang": 1,
+      "muc_tieu_ids": ["KT1"],
+      "muc_tieu_hoat_dong": "Hệ thống lại từ vựng trọng tâm và chuẩn bị cho bài sau, dự án Unit 2.",
+      "noi_dung": "Chuỗi nói nối tiếp: mỗi HS nói 1 câu dùng 1 từ của bài (30 giây/dãy); GV giao bài về nhà.",
+      "san_pham": "Ít nhất 6 câu đúng của cả lớp có dùng từ của bài; HS ghi bài về nhà vào vở.",
+      "to_chuc": {
+        "giao_nhiem_vu": "GV nêu luật chuỗi nói nối tiếp theo dãy bàn.",
+        "thuc_hien_nhiem_vu": "HS lần lượt nói câu có từ của bài.",
+        "bao_cao_thao_luan": "HS nhận xét câu đúng/sai của bạn.",
+        "ket_luan_nhan_dinh": "GV chốt từ trọng tâm, giao bài về nhà."
+      },
+      "hinh_thuc": "ca_lop",
+      "phan_vai": [],
+      "kiem_tra_hieu_bai": { "co": false, "cong_cu": "", "cach_dieu_chinh": "" },
+      "muc_icap": "active",
+      "muc_bloom": "van_dung",
+      "ho_tro_hs": "HS yếu được chọn từ dễ (fresh, join) và dùng mẫu câu trên bảng.",
+      "tlim_ids": [],
+      "gia_tri_ids": [],
+      "trao_quyen_ids": [],
+      "rubric_ids": [],
+      "dung_ai": "",
+      "cau_hoi_chiem_nghiem": []
+    }
+  ],
+  "du_kien_kho_khan": [
+    { "kho_khan": "HS thiếu hiểu biết, trải nghiệm về chủ đề.", "giai_phap": "Chuẩn bị tranh, handout và khung câu gợi ý." },
+    { "kho_khan": "HS chưa đủ kỹ năng nghe, nói và hợp tác.", "giai_phap": "Mở file nghe nhiều lần theo nhu cầu; ghép cặp/nhóm khá – yếu; phân vai rõ để mọi HS có việc; GV phản hồi, hỗ trợ kịp thời." },
+    { "kho_khan": "Nhóm làm poster quá giờ.", "giai_phap": "Timekeeper nhắc giờ theo bước; GV báo mốc còn 2 phút; poster chỉ cần 3 lời khuyên + 1 \"hòn đá lớn\"." }
+  ],
+  "huong_dan_ve_nha": "Học thuộc từ vựng mới; chuẩn bị từ vựng cho bài A Closer Look 1.\nBắt đầu chuẩn bị Project của Unit 2: nhóm 4–5 HS chọn một thói quen xấu học sinh trường mình hay mắc, nghĩ lời khuyên để thay đổi, tìm ảnh/vẽ tranh làm poster; trình bày ở Lesson 7 – Looking back & Project (GV kiểm tra tiến độ sau mỗi bài).\nThực hiện cam kết \"hòn đá lớn\" về sức khoẻ trong tuần và ghi lại 3 lần thực hiện.",
+  "ghi_chu_thay_doi": [
+    "Chuyển tiến trình PPP sang tiến trình 5 bước 4PP (Làm rõ kỳ vọng → Thực hành → Báo cáo đánh giá → Chiêm nghiệm → Củng cố) với phương pháp Same/Different, giữ nguyên toàn bộ ngữ liệu, bài tập và đáp án của bản gốc.",
+    "Bổ sung mục tiêu TLIM (Thói quen 3 – Ưu tiên điều quan trọng, công cụ Ưu tiên/\"Hòn đá lớn\") và Trao quyền (TQ1–TQ3, đáp ứng 6/6 tiêu chí) — bản gốc chưa có (Bước 1, Bước 6).",
+    "Bổ sung hoạt động Chiêm nghiệm (bản gốc thiếu — lỗi P1) với câu hỏi chạm vào Thói quen 3 và giá trị Trách nhiệm (Bước 7.D2).",
+    "Bổ sung bộ câu hỏi định hướng theo khung Same/Different và rubric R1 công bố đầu tiết (bản gốc thiếu — Bước 1).",
+    "Phân bổ lại thời gian: bản gốc ghi tổng 36 phút (2 hoạt động không ghi phút) → nay đủ 45 phút, HS hoạt động ~76% (Bước 4, Bước 7.D1).",
+    "Bổ sung phân vai trong nhóm/cặp và 2 điểm kiểm tra mức hiểu giữa bài bằng bảng con (Bước 7.D1).",
+    "Viết lại mục tiêu theo động từ đo lường được và gắn mã để đối chiếu mục tiêu ↔ hoạt động (Bước 5)."
+  ]
+}

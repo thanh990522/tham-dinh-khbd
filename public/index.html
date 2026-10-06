@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KHBD Việt Anh</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-in">
+      <div>
+        <div class="brand">TRƯỜNG VIỆT ANH <span class="muted">· Vui Vẻ &amp; Thực Dụng</span></div>
+        <h1>Trợ lý Kế hoạch bài dạy đạt chuẩn</h1>
+        <p class="sub">CV5512 (Phụ lục IV) · 4 phương pháp Việt Anh · Active Learning · TLIM &amp; 5 giá trị · Bảng điểm thẩm định /100</p>
+      </div>
+      <div id="status" class="badge">Đang kiểm tra máy chủ…</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="codeBox" class="card hidden">
+      <label>Mã truy cập của trường <input id="accessCode" type="password" autocomplete="off" placeholder="Nhập mã do quản trị cấp"></label>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-mode="nang_cap" role="tab">① Nâng cấp từ file giáo án</button>
+      <button class="tab" data-mode="soan_moi" role="tab">② Soạn mới</button>
+      <button class="tab" data-mode="tham_dinh" role="tab">③ Chỉ thẩm định bản gốc</button>
+    </nav>
+    <p id="modeHelp" class="help"></p>
+
+    <section id="uploadCard" class="card">
+      <h2>1. Tải giáo án lên</h2>
+      <label class="drop" id="drop">
+        <input id="file" type="file" accept=".docx,.pdf,.txt,.md,.json">
+        <span class="drop-t">Kéo thả hoặc bấm để chọn file <b>.docx</b>, <b>.pdf</b>, <b>.txt</b> (hoặc <b>.json</b> KHBD đã xuất)</span>
+        <span id="fileName" class="muted"></span>
+      </label>
+      <div id="lessons" class="lessons"></div>
+    </section>
+
+    <section class="card">
+      <h2 id="infoTitle">2. Thông tin bài dạy</h2>
+      <div class="grid">
+        <label>Môn học <input id="mon_hoc" placeholder="vd: Tiếng Anh"></label>
+        <label>Lớp <input id="lop" placeholder="vd: 7"></label>
+        <label class="span2">Tên bài / chủ đề <input id="ten_bai" placeholder="Để trống: tự lấy từ file"></label>
+        <label>Bộ sách <input id="bo_sach" value="Kết nối tri thức với cuộc sống"></label>
+        <label>Số tiết của KHBD <input id="so_tiet" type="number" min="1" max="6" value="1"></label>
+        <label>Tiết PPCT <input id="tiet_ppct"></label>
+        <label>Tuần <input id="tuan"></label>
+        <label>Tổ chuyên môn <input id="to_chuyen_mon"></label>
+        <label>Giáo viên <input id="giao_vien"></label>
+        <label class="span2">Phương pháp
+          <select id="phuong_phap">
+            <option value="AUTO">Để hệ thống tự chọn phương pháp phù hợp nhất</option>
+            <option value="THUONG">Tiết thông thường (CV5512, chấm 12 tiêu chí CV5555)</option>
+            <option value="CT">Critical Thinking – PRAAD</option>
+            <option value="LA">LikeAbility – phân cấp (hợp bài ôn tập)</option>
+            <option value="CA">CrossAbility – chọn chủ đề, dạy lại</option>
+            <option value="SD">Same / Different – chọn phương án, so sánh</option>
+          </select>
+        </label>
+        <label>Ngôn ngữ nội dung
+          <select id="ngon_ngu">
+            <option>Tiếng Việt</option>
+            <option>Tiếng Việt cho phần tổ chức; tiếng Anh cho ngữ liệu, câu hỏi, đáp án</option>
+            <option>English</option>
+          </select>
+        </label>
+        <div class="checks">
+          <label class="chk"><input id="su_dung_ai" type="checkbox"> Tiết học có sử dụng AI</label>
+          <label class="chk"><input id="tra_cuu" type="checkbox" checked> Tra cứu yêu cầu cần đạt &amp; SGK trên web</label>
+        </div>
+        <label class="span-all">Yêu cầu bổ sung (không bắt buộc)
+          <textarea id="yeu_cau_them" rows="2" placeholder="vd: lớp có nhiều HS yếu; muốn dùng Thói quen 6 – Hợp lực; phòng học không có máy chiếu…"></textarea>
+        </label>
+      </div>
+      <button id="run" class="primary" disabled>Tạo KHBD hoàn chỉnh</button>
+      <span id="runHint" class="muted"></span>
+    </section>
+
+    <section id="progressCard" class="card hidden">
+      <h2>3. Tiến trình</h2>
+      <ol id="log" class="log"></ol>
+      <div id="results"></div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary><b>Hệ thống kiểm tra và tự sửa những gì?</b></summary>
+        <div class="explain">
+          <p>Mỗi KHBD được soạn theo cấu trúc chặt, sau đó đi qua <b>vòng kiểm tra – chấm – tự sửa</b> cho tới khi đạt ≥ <span id="target">88</span>/100 và không còn lỗi P1/P2 (tối đa <span id="rounds">2</span> vòng sửa):</p>
+          <table>
+            <tr><th>Thành phần</th><th>Điểm</th><th>Cách kiểm</th></tr>
+            <tr><td>Bước 1 – Khung mẫu: đủ mục tiêu (5 phần với 4PP), thiết bị, 4 mục a–d mỗi hoạt động, Chiêm nghiệm + Củng cố, bộ câu hỏi định hướng, rubric, yếu tố đặc thù phương pháp</td><td>15</td><td>Quy tắc tự động</td></tr>
+            <tr><td>Bước 2/3 – Yêu cầu cần đạt (tra cứu web, đối chiếu ≥2 nguồn)</td><td>10</td><td>AI chấm</td></tr>
+            <tr><td>Bước 4 – Thời gian: tổng = 45 × số tiết, không dồn Chiêm nghiệm/Củng cố</td><td>cảnh báo</td><td>Quy tắc tự động</td></tr>
+            <tr><td>Bước 5 – Ma trận mục tiêu ↔ hoạt động: không mục tiêu bị bỏ rơi, không hoạt động lạc</td><td>20</td><td>Quy tắc tự động</td></tr>
+            <tr><td>Bước 6 – 4PPM (TC1, TC3, TC4, TLIM, Trao quyền) hoặc CV5555 (1.1–1.4, 2.1, 2.3); phần chờ dự giờ loại khỏi mẫu số</td><td>40</td><td>AI chấm + quy tắc (lấy điểm thấp hơn)</td></tr>
+            <tr><td>Bước 7 – Active Learning (HS hoạt động ≥50%, GV giảng ≤10 phút/lượt, nhóm có phân vai, kiểm tra hiểu giữa bài) · 5GT&amp;7TQ (≤2 mục, gắn hoạt động, câu chiêm nghiệm, dòng rubric) · Ứng dụng AI</td><td>15</td><td>Quy tắc tự động</td></tr>
+          </table>
+          <p class="muted">Lỗi P1 (thiếu Chiêm nghiệm, thiếu bộ câu hỏi định hướng, mục tiêu bị bỏ rơi, LikeAbility &lt; 3 cấp, giá trị/thói quen không được thực hiện, HS hoạt động &lt; 30%, AI làm thay tư duy) luôn chặn duyệt.</p>
+          <p class="warn" id="tqNote"></p>
+        </div>
+      </details>
+    </section>
+  </main>
+  <footer class="wrap muted foot">Kết quả do AI hỗ trợ — giáo viên và TTCM rà soát lần cuối trước khi lên lớp. Chi tiết SGK chưa xác minh được luôn được đánh dấu đỏ trong file.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
