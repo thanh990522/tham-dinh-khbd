@@ -3,15 +3,26 @@ import Anthropic from '@anthropic-ai/sdk';
 import { KHBD_SCHEMA, GRADE_SCHEMA } from './schema.js';
 import { buildSystemPrompt, buildMetaBlock } from './prompts.js';
 
-let client;
-function getClient() {
-  // Tự nhận ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / hồ sơ `ant auth login`.
-  if (!client) client = new Anthropic({ maxRetries: 3, timeout: 20 * 60 * 1000 });
-  return client;
+let serverClient;
+const userClients = new Map();
+function getClient(config) {
+  // Khoá do người dùng nhập trên web (config._apiKey) được ưu tiên; nếu không có thì dùng
+  // ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / hồ sơ `ant auth login` của máy chủ.
+  const opts = { maxRetries: 3, timeout: 20 * 60 * 1000 };
+  if (config?._apiKey) {
+    if (!userClients.has(config._apiKey)) userClients.set(config._apiKey, new Anthropic({ ...opts, apiKey: config._apiKey }));
+    return userClients.get(config._apiKey);
+  }
+  if (!serverClient) serverClient = new Anthropic(opts);
+  return serverClient;
 }
 
-export function aiAvailable() {
+export function serverKeyAvailable() {
   return Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_PROFILE || process.env.AI_FORCE_ENABLE);
+}
+
+export function aiAvailable(config) {
+  return Boolean(config?._apiKey) || serverKeyAvailable();
 }
 
 const useFallbacks = () => process.env.AI_FALLBACKS !== 'off';
@@ -33,7 +44,7 @@ async function callClaude({ config, system, content, effort, format, tools, maxT
       ...(tools ? { tools } : {}),
       ...(useFallbacks() ? { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } : {}),
     };
-    const stream = getClient().beta.messages.stream(params);
+    const stream = getClient(config).beta.messages.stream(params);
     if (onText) stream.on('text', (delta) => onText(delta));
     const msg = await stream.finalMessage();
     if (msg.stop_reason === 'refusal') {

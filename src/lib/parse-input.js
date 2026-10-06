@@ -9,6 +9,8 @@ const decode = (s) => s.replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (m) => ENTITIES[
 
 export function htmlToText(html) {
   let s = html;
+  // Ảnh đã được thay bằng ký hiệu [HÌNH n] (xem extractText); ảnh không đọc được thì bỏ.
+  s = s.replace(/<img[^>]*alt="(\[HÌNH \d+\])"[^>]*>/gi, ' $1 ');
   s = s.replace(/<img[^>]*>/gi, '');
   // Ô bảng: gộp các đoạn trong ô bằng " / " để mỗi hàng nằm trên một dòng
   s = s.replace(/<t([dh])(?:\s[^>]*)?>([\s\S]*?)<\/t\1>/gi, (_, _tag, inner) => {
@@ -39,17 +41,52 @@ export function htmlToText(html) {
 export async function extractText(buffer, filename) {
   const ext = (filename.split('.').pop() || '').toLowerCase();
   if (ext === 'docx') {
+    const images = [];
     const { value, messages } = await mammoth.convertToHtml(
       { buffer },
-      { convertImage: mammoth.images.imgElement(() => Promise.resolve({ src: '' })) }
+      {
+        convertImage: mammoth.images.imgElement(async (img) => {
+          // Chỉ giữ PNG/JPEG/GIF (Word nhúng được); EMF/WMF bỏ qua
+          const type = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif' }[img.contentType];
+          if (!type) return { src: '' };
+          const data = Buffer.from(await img.read('base64'), 'base64');
+          const size = imageSize(data, type);
+          if (!size || size.width < 24 || size.height < 24) return { src: '' }; // bỏ ảnh đệm 1×1
+          images.push({ n: images.length + 1, type, data, ...size });
+          return { src: '', alt: `[HÌNH ${images.length}]` };
+        }),
+      }
     );
-    return { kind: 'text', text: htmlToText(value), warnings: messages.filter((m) => m.type === 'error').map((m) => m.message) };
+    return { kind: 'text', text: htmlToText(value), images, warnings: messages.filter((m) => m.type === 'error').map((m) => m.message) };
   }
   if (ext === 'txt' || ext === 'md') return { kind: 'text', text: buffer.toString('utf8'), warnings: [] };
   if (ext === 'pdf') return { kind: 'pdf', base64: buffer.toString('base64'), text: '', warnings: [] };
   if (ext === 'doc') throw new Error('File .doc (Word 97–2003) chưa hỗ trợ — vui lòng mở bằng Word và "Lưu thành" .docx.');
   throw new Error(`Định dạng .${ext} chưa hỗ trợ. Hãy dùng .docx, .pdf hoặc .txt.`);
 }
+
+// Đọc kích thước ảnh từ header (không cần thư viện ngoài)
+export function imageSize(buf, type) {
+  try {
+    if (type === 'png' && buf.readUInt32BE(12) === 0x49484452) return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+    if (type === 'gif') return { width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) };
+    if (type === 'jpg') {
+      let i = 2;
+      while (i < buf.length) {
+        if (buf[i] !== 0xff) return null;
+        const marker = buf[i + 1];
+        const len = buf.readUInt16BE(i + 2);
+        if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) return { height: buf.readUInt16BE(i + 5), width: buf.readUInt16BE(i + 7) };
+        i += 2 + len;
+      }
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+export const imageRefs = (text) => [...new Set([...String(text).matchAll(/\[HÌNH (\d+)\]/g)].map((m) => Number(m[1])))];
 
 // Nhận diện tiêu đề tiết/bài ở đầu dòng: "Lesson 1:", "Tiết 12", "TIẾT 3 –", "Period 4", "Bài 5:"
 const HEADING = /^\s*(?:lesson|period|tiết|bài|chủ đề)\s*(\d{1,3})\b\s*[:.–\-—]?\s*(.*)$/i;

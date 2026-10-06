@@ -1,7 +1,7 @@
 // Xuất file Word: (1) KHBD hoàn chỉnh theo khung CV5512 / khung 4PP Việt Anh; (2) Báo cáo thẩm định.
 import {
   AlignmentType, BorderStyle, Document, HeadingLevel, Packer, PageBreak, Paragraph, ShadingType,
-  Table, TableCell, TableRow, TextRun, WidthType, VerticalAlign, PageOrientation,
+  Table, TableCell, TableRow, TextRun, WidthType, VerticalAlign, PageOrientation, ImageRun, LineRuleType,
 } from 'docx';
 import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from './schema.js';
 
@@ -10,13 +10,27 @@ const CONTENT_W = 9355; // A4, lề trái 3cm, phải 1.5cm (twip)
 const LAND_W = 14400; // A4 ngang cho bảng 3 cột
 
 // ───────── helpers ─────────
+// Ảnh từ giáo án gốc: ký hiệu [HÌNH n] trong văn bản được thay bằng ảnh thật khi xuất.
+let IMAGES = new Map();
+const MAX_IMG_W = 160; // px
 const run = (text, o = {}) => new TextRun({ text: String(text ?? ''), font: FONT, size: o.size || 26, bold: o.bold, italics: o.italics, color: o.color });
+function imageRun(n) {
+  const img = IMAGES.get(n);
+  if (!img) return run(`(hình ${n} trong giáo án gốc)`, { italics: true, size: 22 });
+  const scale = Math.min(1, MAX_IMG_W / img.width);
+  return new ImageRun({ type: img.type, data: img.data, transformation: { width: Math.round(img.width * scale), height: Math.round(img.height * scale) } });
+}
+// Văn bản có thể chứa [HÌNH n] → chuỗi TextRun/ImageRun
+function rich(text, o = {}) {
+  const parts = String(text ?? '').split(/\[HÌNH (\d+)\]/);
+  return parts.flatMap((t, i) => (i % 2 ? [imageRun(Number(t))] : t ? [run(t, o)] : []));
+}
 function para(content, o = {}) {
-  const runs = Array.isArray(content) ? content : [run(content, o)];
+  const runs = Array.isArray(content) ? content : rich(content, o);
   return new Paragraph({
     children: runs,
     alignment: o.align,
-    spacing: { before: o.before ?? 40, after: o.after ?? 60, line: 300 },
+    spacing: { before: o.before ?? 40, after: o.after ?? 60, line: 300, lineRule: LineRuleType.AUTO },
     indent: o.indent ? { left: o.indent } : undefined,
     heading: o.heading,
     keepNext: o.keepNext,
@@ -24,8 +38,8 @@ function para(content, o = {}) {
 }
 const h = (text, level = 1) =>
   para([run(text, { bold: true, size: level === 0 ? 32 : level === 1 ? 28 : 26 })], { before: level <= 1 ? 200 : 120, after: 80, keepNext: true, align: level === 0 ? AlignmentType.CENTER : undefined });
-const label = (lb, text, o = {}) => para([run(lb, { bold: true, size: o.size }), run(text, { size: o.size })], o);
-const bullet = (text, o = {}) => para([run('– ', { size: o.size }), ...(Array.isArray(text) ? text : [run(text, { size: o.size })])], { indent: o.indent ?? 284, ...o });
+const label = (lb, text, o = {}) => para([run(lb, { bold: true, size: o.size }), ...rich(text, { size: o.size })], o);
+const bullet = (text, o = {}) => para([run('– ', { size: o.size }), ...(Array.isArray(text) ? text : rich(text, { size: o.size }))], { indent: o.indent ?? 284, ...o });
 const lines = (text, o = {}) => String(text || '').split('\n').filter((l) => l.trim()).map((l) => para(l, o));
 
 function cell(children, o = {}) {
@@ -232,13 +246,20 @@ function cuoiKHBD(k) {
   return out;
 }
 
-export function khbdSections(k, config) {
+function phuLucHinh(k, refs) {
+  const daDung = new Set([...JSON.stringify(k).matchAll(/\[HÌNH (\d+)\]/g)].map((m) => Number(m[1])));
+  const conLai = (refs || []).filter((n) => !daDung.has(n) && IMAGES.has(n));
+  if (!conLai.length) return [];
+  return [h('PHỤ LỤC – HÌNH ẢNH TỪ GIÁO ÁN GỐC'), para([run('Các hình dưới đây có trong giáo án gốc nhưng chưa được gắn vào hoạt động cụ thể — GV chọn vị trí sử dụng.', { italics: true, size: 22 })]), ...conLai.map((n) => para([run(`Hình ${n}: `, { bold: true }), imageRun(n)]))];
+}
+
+export function khbdSections(k, config, refs) {
   const is4PP = k.meta.phuong_phap !== 'THUONG';
-  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k), ...(is4PP ? [] : tienTrinhThuong(k)), ...(is4PP ? [] : cuoiKHBD(k))];
+  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k), ...(is4PP ? [] : tienTrinhThuong(k)), ...(is4PP ? [] : [...cuoiKHBD(k), ...phuLucHinh(k, refs)])];
   const sections = [{ properties: pagePortrait(), children: portrait }];
   if (is4PP) {
     sections.push({ properties: pageLandscape(), children: tienTrinh4PP(k) });
-    sections.push({ properties: pagePortrait(), children: cuoiKHBD(k) });
+    sections.push({ properties: pagePortrait(), children: [...cuoiKHBD(k), ...phuLucHinh(k, refs)] });
   }
   return sections;
 }
@@ -248,8 +269,10 @@ const pageLandscape = () => ({ page: { size: { width: 11906, height: 16838, orie
 
 const docStyles = { default: { document: { run: { font: FONT, size: 26 } } } };
 
-export async function renderKHBDDocx(list, config) {
-  const sections = list.flatMap((k) => khbdSections(k, config));
+// images: [{n, type, data, width, height}] của file gốc; refs[i]: các số hình thuộc tiết thứ i
+export async function renderKHBDDocx(list, config, { images = [], refs = [] } = {}) {
+  IMAGES = new Map(images.map((im) => [im.n, im]));
+  const sections = list.flatMap((k, i) => khbdSections(k, config, refs[i]));
   const doc = new Document({ creator: config.truong, title: list.map((k) => k.meta.ten_bai).join(' | '), styles: docStyles, sections });
   return Packer.toBuffer(doc);
 }
@@ -342,7 +365,7 @@ export async function renderReportDocx(results, { config, mode }) {
     para([run('BÁO CÁO THẨM ĐỊNH KẾ HOẠCH BÀI DẠY', { bold: true, size: 32 })], { align: AlignmentType.CENTER, before: 120 }),
     para([run(`Năm học ${config.nam_hoc} · Bảng điểm chính thức /100 · Quy trình 7 bước · Mã lỗi P1/P2/P3`, { italics: true, size: 22 })], { align: AlignmentType.CENTER, after: 200 }),
     para([run('Quy tắc: có ≥1 lỗi P1 → bắt buộc nộp lại bản v2, bất kể điểm. Xếp loại: Tốt 85–100 · Đạt 70–84 · Cần cải thiện 50–69 · Chưa đạt <50. Từ 88 điểm và không có P1 → xét Ngân hàng KHBD mẫu.', { size: 22 })]),
-    para([run(`Ghi chú: 6 tiêu chí Trao quyền dùng để chấm là danh sách TẠM do tài liệu nguồn chưa liệt kê — xem config/school.json.`, { italics: true, size: 20 })]),
+    para([run(config.tieu_chi_trao_quyen.da_xac_nhan ? '6 tiêu chí Trao quyền: theo danh sách chính thức của nhà trường.' : 'Ghi chú: 6 tiêu chí Trao quyền dùng để chấm là danh sách TẠM do tài liệu nguồn chưa liệt kê — TTCM cập nhật ở mục Cài đặt trên web.', { italics: true, size: 20 })]),
   ];
   results.forEach((r, i) => {
     if (i > 0) children.push(new Paragraph({ children: [new PageBreak()] }));

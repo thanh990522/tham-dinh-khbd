@@ -48,40 +48,53 @@ Rà soát sơ bộ bản gốc ─► Tra cứu web ─► Claude soạn/nâng c
 6. **Tra cứu YCCĐ + SGK** bằng web search; chi tiết chưa xác minh được thì **đánh dấu đỏ "GV kiểm tra lại theo SGK"**, không bịa.
 7. **Rà soát sơ bộ miễn phí** (không cần AI) ngay khi tải file: thiếu thành phần nào, tổng thời gian bao nhiêu.
 8. **Tải lên file `.json`** (đã xuất từ lần trước, có thể đã chỉnh tay): kiểm tra lại và xuất Word mà không tốn phí AI.
-9. Hiển thị tiến trình trực tiếp; có mã truy cập; giới hạn số job chạy đồng thời.
+9. **Giữ hình ảnh của giáo viên**: tranh/ảnh trong file .docx gốc được chép sang bản mới đúng hoạt động sử dụng; ảnh chưa gắn được đưa vào phụ lục.
+10. **⚙ Cài đặt trên web**: nhập khoá API Claude (lưu trên trình duyệt của từng máy), sửa **6 tiêu chí Trao quyền**, điểm mục tiêu, số vòng tự sửa, tổ chuyên môn mặc định.
+11. Hiển thị tiến trình trực tiếp; mã truy cập tuỳ chọn; giới hạn số job chạy đồng thời. Làm việc hoàn toàn bằng **tải file lên – tải file về**, không cần Google Drive.
 
-## Chạy thử
+## Cách dùng trên máy cá nhân (không cần máy chủ)
+
+1. Cài **Node.js bản LTS** tại https://nodejs.org (một lần).
+2. Tải mã nguồn về máy (nút *Code → Download ZIP* trên GitHub) rồi giải nén.
+3. **Windows:** bấm đúp `Chay_KHBD_Windows.bat` · **macOS/Linux:** chạy `./chay_khbd_mac_linux.sh`. Lần đầu sẽ tự cài thư viện, sau đó trình duyệt tự mở `http://localhost:3000`.
+4. Mở **⚙ Cài đặt** → dán **khoá API Claude** (tạo tại https://console.anthropic.com → API Keys; khoá chỉ lưu trên trình duyệt của máy đó).
+5. Tải file giáo án lên → chọn tiết → **Tạo KHBD hoàn chỉnh** → tải về file Word KHBD và báo cáo thẩm định.
+
+TTCM cập nhật **6 tiêu chí Trao quyền chính thức** và các cài đặt của tổ ngay trong mục ⚙ Cài đặt (khi mở web trên chính máy đang chạy chương trình, hoặc đặt biến `ADMIN_CODE` để sửa từ máy khác).
+
+## Dùng chung cho cả tổ (tuỳ chọn)
+
+Chạy trên một máy/máy chủ chung (có sẵn `Dockerfile`), mỗi người vẫn tự nhập khoá của mình; hoặc đặt `ANTHROPIC_API_KEY` để dùng chung khoá của trường — khi đó **nên đặt `ACCESS_CODE`** vì mỗi lượt soạn đều tốn phí API. Xem `.env.example`.
+
+## Dành cho người phát triển
 
 ```bash
 npm install
-cp .env.example .env    # điền ANTHROPIC_API_KEY và ACCESS_CODE
-export $(grep -v '^#' .env | xargs)
 npm start               # http://localhost:3000
-npm test                # 23 kiểm thử
+npm test                # 25 kiểm thử
 npm run sample          # kiểm tra + xuất Word cho mẫu TA7 Unit 2 Lesson 1
+node scripts/render-sample.js samples/TA7_Unit2_Lesson1.khbd.json samples/output <giáo_án_gốc.docx> 1   # kèm hình gốc
 ```
 
-Khi chưa có `ANTHROPIC_API_KEY`, web vẫn chạy phần rà soát sơ bộ và kiểm tra/xuất Word từ file `.json`.
-
-**Triển khai**: dùng `Dockerfile` kèm sẵn (Render, Railway, Fly.io, VPS…). Đặt `ANTHROPIC_API_KEY` và **bắt buộc đặt `ACCESS_CODE`** khi web công khai, vì mỗi lượt soạn đều tốn phí API.
+Khi chưa có khoá API, web vẫn chạy phần rà soát sơ bộ và kiểm tra/xuất Word từ file `.json`.
 
 ## Mẫu đầu ra
 
-`samples/TA7_Unit2_Lesson1.khbd.json` là bản nâng cấp **Unit 2 – Lesson 1: Getting started** từ giáo án TA7 gốc, theo phương pháp Same/Different. Bản này giữ nguyên ngữ liệu và đáp án của giáo viên, bổ sung TLIM (Thói quen 3), Trao quyền, Chiêm nghiệm, rubric và bộ câu hỏi định hướng. Thời lượng được sửa từ 36 lên 45 phút, HS hoạt động 78%. File Word đã xuất nằm trong `samples/output/`.
+`samples/TA7_Unit2_Lesson1.khbd.json` là bản nâng cấp **Unit 2 – Lesson 1: Getting started** từ giáo án TA7 gốc, theo phương pháp Same/Different. Bản này giữ nguyên ngữ liệu và đáp án của giáo viên, bổ sung TLIM (Thói quen 3), Trao quyền, Chiêm nghiệm, rubric và bộ câu hỏi định hướng. Thời lượng được sửa từ 36 lên 45 phút, HS hoạt động 78%. 2 tranh từ vựng (fresh, join) của bản gốc được giữ ở HD2. Đáp án Bài 2–4 và hình thức Bài 5 đã đối chiếu với lời giải SGK qua tìm kiếm. File Word đã xuất nằm trong `samples/output/`.
 
 Bản gốc của tiết này (theo rà soát sơ bộ) thiếu 10/15 thành phần: TLIM, Trao quyền, Chiêm nghiệm (P1), bộ câu hỏi định hướng, rubric, phương pháp Việt Anh, phân vai, kiểm tra giữa bài, giá trị cốt lõi, ghi chú AI. Tổng thời gian ghi được là 36/45 phút. Lesson 4 và Lesson 6 cũng lệch giờ (41 và 44 phút).
 
 ## Cấu hình — `config/school.json`
 
 - `diem_muc_tieu` (mặc định 88, ngưỡng Ngân hàng KHBD mẫu), `so_vong_tu_sua_toi_da` (mặc định 2), `model`, `effort_soan`, `effort_cham`, `tra_cuu_web`.
-- **`tieu_chi_trao_quyen` — CẦN NHÀ TRƯỜNG XÁC NHẬN.** Tài liệu nguồn chỉ ghi "đáp ứng tối thiểu 4/6 tiêu chí trao quyền" mà **không liệt kê 6 tiêu chí**. Danh sách hiện tại (TQ-a…TQ-f) được tổng hợp tạm từ chính các tài liệu đó. Nhà trường cần thay bằng 6 tiêu chí chính thức. Validator và AI sẽ tự dùng danh sách mới.
+- **`tieu_chi_trao_quyen` — CẦN NHÀ TRƯỜNG XÁC NHẬN.** Tài liệu nguồn chỉ ghi "đáp ứng tối thiểu 4/6 tiêu chí trao quyền" mà **không liệt kê 6 tiêu chí**. Danh sách hiện tại (TQ-a…TQ-f) được tổng hợp tạm từ chính các tài liệu đó (`da_xac_nhan: false`). Khi TTCM lưu danh sách chính thức ở ⚙ Cài đặt, `da_xac_nhan` chuyển thành `true`; bộ kiểm tra, AI và báo cáo sẽ dùng danh sách mới và bỏ ghi chú "TẠM".
 
 ## Giới hạn cần biết
 
 - AI hỗ trợ soạn và chấm; **giáo viên/TTCM vẫn rà soát lần cuối**, đặc biệt các mục đánh dấu đỏ trong phụ lục "Căn cứ chương trình".
 - Phần chấm theo quy tắc kiểm tra *dữ liệu khai báo* trong KHBD (vd số phút GV giảng). Phần này được đối chiếu chéo bởi bước AI chấm, nhưng không thay thế dự giờ.
-- File `.doc` (Word 97–2003) cần lưu lại thành `.docx`. Hình ảnh trong giáo án gốc không được chép sang bản mới.
-- Chưa tích hợp Google Drive/Sổ theo dõi. Đây là phần của skill thẩm định chạy trong Claude, có thể bổ sung sau.
+- File `.doc` (Word 97–2003) cần lưu lại thành `.docx`. Ảnh dạng EMF/WMF (hình vẽ Word cũ) và ảnh trong file PDF không chép sang được; ảnh PNG/JPEG/GIF trong .docx được giữ.
+- File `.json` tải lên lại không còn kèm ảnh gốc (chỉ còn ký hiệu "hình n trong giáo án gốc").
 
 ## Cấu trúc mã
 

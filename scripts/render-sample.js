@@ -1,5 +1,5 @@
 // Kiểm tra + xuất Word cho một (hoặc nhiều) KHBD dạng JSON, không cần AI.
-// Dùng: node scripts/render-sample.js samples/TA7_Unit2_Lesson1.khbd.json [thư_mục_ra]
+// Dùng: node scripts/render-sample.js <file.json> [thư_mục_ra] [giáo_án_gốc.docx — để lấy hình [HÌNH n]] [số tiết trong file gốc]
 import fs from 'node:fs';
 import path from 'node:path';
 import { validateKHBD, tongHopDiem } from '../src/lib/validator.js';
@@ -7,6 +7,7 @@ import { fillBySchema } from '../src/lib/ai.js';
 import { KHBD_SCHEMA } from '../src/lib/schema.js';
 import { renderKHBDDocx, renderReportDocx } from '../src/lib/render-docx.js';
 import { loadConfig } from '../src/lib/config.js';
+import { extractText, splitLessons, imageRefs } from '../src/lib/parse-input.js';
 
 const file = process.argv[2] || 'samples/TA7_Unit2_Lesson1.khbd.json';
 const outDir = process.argv[3] || 'samples/output';
@@ -29,6 +30,14 @@ for (const r of results) {
 }
 fs.mkdirSync(outDir, { recursive: true });
 const base = path.basename(file).replace(/\.khbd\.json$|\.json$/, '');
-fs.writeFileSync(path.join(outDir, `${base}_KHBD.docx`), await renderKHBDDocx(list, config));
+let images = [];
+let refs = [];
+if (process.argv[4]) {
+  const orig = await extractText(fs.readFileSync(process.argv[4]), process.argv[4]);
+  images = orig.images || [];
+  const part = splitLessons(orig.text).find((p) => p.so === Number(process.argv[5] || 1));
+  refs = list.map(() => (part ? imageRefs(part.text) : []));
+}
+fs.writeFileSync(path.join(outDir, `${base}_KHBD.docx`), await renderKHBDDocx(list, config, { images, refs }));
 fs.writeFileSync(path.join(outDir, `${base}_BaoCao.docx`), await renderReportDocx(results, { config, mode: 'nang_cap' }));
 console.log(`\nĐã xuất: ${outDir}/${base}_KHBD.docx, ${base}_BaoCao.docx`);

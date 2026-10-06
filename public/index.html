@@ -19,8 +19,33 @@
   </header>
 
   <main class="wrap">
-    <section id="codeBox" class="card hidden">
-      <label>Mã truy cập của trường <input id="accessCode" type="password" autocomplete="off" placeholder="Nhập mã do quản trị cấp"></label>
+    <section class="card">
+      <details id="settings">
+        <summary><b>⚙ Cài đặt</b> <span id="settingsHint" class="muted"></span></summary>
+        <div class="grid" style="margin-top:12px">
+          <label class="span2">Khoá API Claude của thầy/cô
+            <input id="apiKey" type="password" autocomplete="off" placeholder="sk-ant-… (lấy tại console.anthropic.com)">
+            <span class="muted small">Chỉ lưu trên trình duyệt của máy này; gửi kèm mỗi lần soạn, máy chủ không lưu lại.</span>
+          </label>
+          <label id="codeBox" class="span2 hidden">Mã truy cập của trường
+            <input id="accessCode" type="password" autocomplete="off" placeholder="Nhập mã do quản trị cấp">
+          </label>
+        </div>
+        <h3>Cài đặt của tổ / nhà trường</h3>
+        <p class="muted small" id="adminHint"></p>
+        <div class="grid">
+          <label>Tổ chuyên môn mặc định <input id="cfgTo"></label>
+          <label>Điểm mục tiêu tự sửa <input id="cfgTarget" type="number" min="70" max="100"></label>
+          <label>Số vòng tự sửa tối đa <input id="cfgRounds" type="number" min="0" max="4"></label>
+          <label class="chk" style="align-self:end"><input id="cfgWeb" type="checkbox"> Cho phép tra cứu web</label>
+          <div class="span-all">
+            <div class="muted small"><b>6 tiêu chí Trao quyền</b> (dùng để chấm "đạt ≥4/6") — <span id="tqState"></span></div>
+            <ol id="tqList" class="tq"></ol>
+          </div>
+          <label id="adminBox" class="span2 hidden">Mã quản trị <input id="adminCode" type="password" autocomplete="off"></label>
+        </div>
+        <button id="saveCfg" class="secondary">Lưu cài đặt của tổ</button> <span id="cfgMsg" class="muted"></span>
+      </details>
     </section>
 
     <nav class="tabs" role="tablist">

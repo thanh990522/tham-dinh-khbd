@@ -1,5 +1,5 @@
 // Điều phối một "job": nhận file/thông tin → (tra cứu) → soạn/nâng cấp → vòng kiểm tra–chấm–tự sửa → xuất file.
-import { preAudit } from './parse-input.js';
+import { preAudit, imageRefs } from './parse-input.js';
 import { validateKHBD, tongHopDiem } from './validator.js';
 import * as realAI from './ai.js';
 import { fillBySchema } from './ai.js';
@@ -13,7 +13,7 @@ export async function runJob(job, { parts, input, opts, mode, config }, deps = {
   const { research, generateKHBD, reviseKHBD, gradeKHBD, aiAvailable } = { ...realAI, ...deps };
   const log = (msg, extra = {}) => job.emit({ type: 'log', msg, ...extra });
   const results = [];
-  const useAI = aiAvailable();
+  const useAI = aiAvailable(config);
   const target = config.diem_muc_tieu;
 
   for (const [idx, part] of parts.entries()) {
@@ -33,7 +33,7 @@ export async function runJob(job, { parts, input, opts, mode, config }, deps = {
     }
     if (!useAI) {
       results.push({ part, pre, research: null, khbd: null, validation: null, grade: null, score: null, history: [] });
-      log(`${nhan}: chưa cấu hình ANTHROPIC_API_KEY — chỉ xuất báo cáo rà soát sơ bộ.`, { level: 'warn' });
+      log(`${nhan}: chưa có khoá API Claude (nhập ở mục Cài đặt) — chỉ xuất báo cáo rà soát sơ bộ.`, { level: 'warn' });
       continue;
     }
 
@@ -84,7 +84,10 @@ export async function runJob(job, { parts, input, opts, mode, config }, deps = {
   const files = {};
   const coKHBD = results.filter((r) => r.khbd);
   if (coKHBD.length && mode !== 'tham_dinh') {
-    files['KHBD_hoan_chinh.docx'] = await renderKHBDDocx(coKHBD.map((r) => r.khbd), config);
+    files['KHBD_hoan_chinh.docx'] = await renderKHBDDocx(coKHBD.map((r) => r.khbd), config, {
+      images: input.images || [],
+      refs: coKHBD.map((r) => imageRefs(r.part.text)),
+    });
   }
   files['Bao_cao_tham_dinh.docx'] = await renderReportDocx(results, { config, mode });
   if (coKHBD.length) files['KHBD.json'] = Buffer.from(JSON.stringify(coKHBD.map((r) => r.khbd), null, 2), 'utf8');

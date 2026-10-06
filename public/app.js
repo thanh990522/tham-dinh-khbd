@@ -9,8 +9,27 @@ const MODE_HELP = {
   tham_dinh: 'Chấm bản gốc đúng như giáo viên nộp (không sửa) theo bảng điểm /100, mã lỗi P1/P2/P3 — dùng cho TTCM.',
 };
 
+const store = {
+  get: (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+  set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch { /* bỏ qua */ } },
+};
 function code() { return $('accessCode').value.trim(); }
-function headers(extra = {}) { return code() ? { ...extra, 'x-access-code': code() } : extra; }
+function apiKey() { return $('apiKey').value.trim(); }
+function headers(extra = {}) {
+  const h = { ...extra };
+  if (code()) h['x-access-code'] = code();
+  if (apiKey()) h['x-claude-key'] = apiKey();
+  return h;
+}
+function aiReady() { return Boolean(state.status?.ai_may_chu || apiKey()); }
+function renderAIBadge() {
+  const b = $('status');
+  if (!state.status) return;
+  b.textContent = state.status.ai_may_chu ? `AI sẵn sàng · ${state.status.model}` : apiKey() ? `AI sẵn sàng (khoá của thầy/cô) · ${state.status.model}` : 'Chưa có khoá API — mở ⚙ Cài đặt';
+  b.className = `badge ${aiReady() ? 'ok' : 'bad'}`;
+  $('settingsHint').textContent = aiReady() ? '' : '— cần nhập khoá API Claude để soạn bằng AI';
+  if (!aiReady()) $('settings').open = true;
+}
 function withCode(url) { return code() ? `${url}${url.includes('?') ? '&' : '?'}code=${encodeURIComponent(code())}` : url; }
 
 async function loadStatus() {
@@ -18,13 +37,29 @@ async function loadStatus() {
     const r = await fetch('/api/status');
     const s = await r.json();
     state.status = s;
-    const b = $('status');
-    b.textContent = s.ai ? `AI sẵn sàng · ${s.model}` : 'AI chưa cấu hình (chỉ rà soát sơ bộ)';
-    b.className = `badge ${s.ai ? 'ok' : 'bad'}`;
+    renderAIBadge();
     $('target').textContent = s.diem_muc_tieu;
     $('rounds').textContent = s.so_vong;
     if (s.can_ma) $('codeBox').classList.remove('hidden');
-    $('tqNote').textContent = '⚠ ' + (s.tieu_chi_trao_quyen?._GHI_CHU || '');
+    const tq = s.tieu_chi_trao_quyen || {};
+    $('tqNote').textContent = tq.da_xac_nhan ? '6 tiêu chí Trao quyền: theo danh sách chính thức của nhà trường.' : '⚠ ' + (tq._GHI_CHU || '');
+    $('tqState').textContent = tq.da_xac_nhan ? 'đã xác nhận' : 'đang dùng danh sách TẠM — hãy thay bằng danh sách chính thức';
+    $('tqState').className = tq.da_xac_nhan ? '' : 'warn';
+    $('tqList').innerHTML = '';
+    (tq.danh_sach || []).forEach((x) => {
+      const li = document.createElement('li');
+      const inp = document.createElement('input');
+      inp.value = x.ten;
+      li.appendChild(inp);
+      $('tqList').appendChild(li);
+    });
+    $('cfgTo').value = s.to_chuyen_mon_mac_dinh || '';
+    $('cfgTarget').value = s.diem_muc_tieu;
+    $('cfgRounds').value = s.so_vong;
+    $('cfgWeb').checked = s.tra_cuu_web !== false;
+    if (!$('to_chuyen_mon').value) $('to_chuyen_mon').value = s.to_chuyen_mon_mac_dinh || '';
+    if (s.sua_cau_hinh === 'can_ma') { $('adminBox').classList.remove('hidden'); $('adminHint').textContent = 'Cần mã quản trị để lưu.'; }
+    else $('adminHint').textContent = 'Chỉ lưu được khi mở web trên chính máy đang chạy chương trình.';
   } catch {
     $('status').textContent = 'Không kết nối được máy chủ';
   }
@@ -196,7 +231,28 @@ function showResults(jobId, e) {
   box.appendChild(dl);
 }
 
+async function saveCfg() {
+  const body = {
+    to_chuyen_mon_mac_dinh: $('cfgTo').value.trim(),
+    diem_muc_tieu: Number($('cfgTarget').value),
+    so_vong_tu_sua_toi_da: Number($('cfgRounds').value),
+    tra_cuu_web: $('cfgWeb').checked,
+    tieu_chi_trao_quyen: [...$('tqList').querySelectorAll('input')].map((i) => i.value.trim()),
+  };
+  const h = { 'Content-Type': 'application/json', ...headers() };
+  if ($('adminCode').value.trim()) h['x-admin-code'] = $('adminCode').value.trim();
+  const r = await fetch('/api/config', { method: 'PUT', headers: h, body: JSON.stringify(body) });
+  const d = await r.json();
+  $('cfgMsg').textContent = r.ok ? 'Đã lưu.' : d.error;
+  if (r.ok) loadStatus();
+}
+
 // ── sự kiện ──
+$('apiKey').value = store.get('khbd_api_key');
+$('accessCode').value = store.get('khbd_access_code');
+$('apiKey').addEventListener('change', () => { store.set('khbd_api_key', apiKey()); renderAIBadge(); });
+$('accessCode').addEventListener('change', () => store.set('khbd_access_code', code()));
+$('saveCfg').addEventListener('click', saveCfg);
 document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => setMode(t.dataset.mode)));
 $('file').addEventListener('change', (e) => e.target.files[0] && analyze(e.target.files[0]));
 const drop = $('drop');

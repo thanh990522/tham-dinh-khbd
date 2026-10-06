@@ -11,7 +11,8 @@
   "effort_cham": "medium",
   "tra_cuu_web": true,
   "tieu_chi_trao_quyen": {
-    "_GHI_CHU": "TẠM THỜI — Các văn bản đã cung cấp (skill + Bộ tiêu chí) chỉ ghi 'đáp ứng tối thiểu 4/6 tiêu chí trao quyền' nhưng KHÔNG liệt kê 6 tiêu chí. Danh sách dưới đây được tổng hợp từ chính các tài liệu đó (định nghĩa Trao quyền ở mục C kiến thức nền, AL7 lựa chọn/tự chủ, cơ chế LikeAbility/CrossAbility/Same-Different, công cụ lãnh đạo). Nhà trường cần THAY bằng 6 tiêu chí chính thức nếu có.",
+    "da_xac_nhan": false,
+    "_GHI_CHU": "TẠM THỜI — Các văn bản đã cung cấp (skill + Bộ tiêu chí) chỉ ghi 'đáp ứng tối thiểu 4/6 tiêu chí trao quyền' nhưng KHÔNG liệt kê 6 tiêu chí. Danh sách dưới đây được tổng hợp từ chính các tài liệu đó (định nghĩa Trao quyền ở mục C kiến thức nền, AL7 lựa chọn/tự chủ, cơ chế LikeAbility/CrossAbility/Same-Different, công cụ lãnh đạo). TTCM cập nhật 6 tiêu chí chính thức ở mục Cài đặt trên web (hoặc sửa file này).",
     "danh_sach": [
       { "ma": "TQ-a", "ten": "HS được LỰA CHỌN thực chất (chủ đề / phương án / cấp độ nhiệm vụ)" },
       { "ma": "TQ-b", "ten": "HS tự đặt mục tiêu hoặc lập kế hoạch thực hiện nhiệm vụ trước khi làm" },

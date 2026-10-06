@@ -59,3 +59,26 @@ test('xuất Word KHBD (4PP và tiết thường) và báo cáo thành file .doc
   const rep = await renderReportDocx([{ part: { tieu_de: 'x' }, pre: preAudit('abc'), khbd: k4, validation: v, grade: null, score: tongHopDiem(v, null), history: [] }], { config, mode: 'nang_cap' });
   assert.equal(rep.subarray(0, 2).toString(), 'PK');
 });
+
+test('imageSize đọc kích thước PNG/JPEG; imageRefs tìm ký hiệu [HÌNH n]', async () => {
+  const { imageSize, imageRefs } = await import('../src/lib/parse-input.js');
+  const png = Buffer.alloc(24);
+  png.writeUInt32BE(0x49484452, 12);
+  png.writeUInt32BE(300, 16);
+  png.writeUInt32BE(200, 20);
+  assert.deepEqual(imageSize(png, 'png'), { width: 300, height: 200 });
+  const jpg = Buffer.from([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x64, 0x00, 0x96]);
+  assert.deepEqual(imageSize(jpg, 'jpg'), { width: 150, height: 100 });
+  assert.deepEqual(imageRefs('a [HÌNH 2] b [HÌNH 5] c [HÌNH 2]'), [2, 5]);
+});
+
+test('xuất Word chèn ảnh gốc tại [HÌNH n] và phụ lục ảnh chưa dùng', async () => {
+  // PNG 1×1 hợp lệ, khai báo kích thước 40×40 để không bị coi là ảnh đệm
+  const data = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==', 'base64');
+  const k = sample();
+  k.hoat_dong[1].noi_dung += ' [HÌNH 1]';
+  const buf = await renderKHBDDocx([k], config, { images: [{ n: 1, type: 'png', data, width: 40, height: 40 }, { n: 2, type: 'png', data, width: 40, height: 40 }], refs: [[1, 2]] });
+  const zip = buf.toString('latin1');
+  assert.match(zip, /word\/media\//);
+  assert.equal(buf.subarray(0, 2).toString(), 'PK');
+});

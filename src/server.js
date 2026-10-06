@@ -6,8 +6,8 @@ import { EventEmitter } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { extractText, splitLessons, preAudit } from './lib/parse-input.js';
 import { runJob } from './lib/pipeline.js';
-import { aiAvailable } from './lib/ai.js';
-import { loadConfig } from './lib/config.js';
+import { serverKeyAvailable } from './lib/ai.js';
+import { loadConfig, saveConfig } from './lib/config.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const config = loadConfig();
@@ -56,9 +56,12 @@ app.use('/api', (req, res, next) => {
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(here, '..', 'public')));
 
+const isLocal = (req) => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress);
+
 app.get('/api/status', (_req, res) => {
   res.json({
-    ai: aiAvailable(),
+    ai: serverKeyAvailable(),
+    ai_may_chu: serverKeyAvailable(),
     model: config.model,
     can_ma: Boolean(process.env.ACCESS_CODE),
     truong: config.truong,
@@ -66,7 +69,38 @@ app.get('/api/status', (_req, res) => {
     diem_muc_tieu: config.diem_muc_tieu,
     so_vong: config.so_vong_tu_sua_toi_da,
     tieu_chi_trao_quyen: config.tieu_chi_trao_quyen,
+    to_chuyen_mon_mac_dinh: config.to_chuyen_mon_mac_dinh,
+    tra_cuu_web: config.tra_cuu_web,
+    sua_cau_hinh: Boolean(process.env.ADMIN_CODE) ? 'can_ma' : 'chi_may_nay',
   });
+});
+
+// Cài đặt của tổ/trường: 6 tiêu chí Trao quyền chính thức, điểm mục tiêu, số vòng tự sửa…
+// Có ADMIN_CODE → cần mã quản trị; không có → chỉ sửa được khi mở web trên chính máy chạy chương trình.
+app.put('/api/config', (req, res) => {
+  const admin = process.env.ADMIN_CODE;
+  const digest = (s) => crypto.createHash('sha256').update(String(s)).digest();
+  const got = req.get('x-admin-code');
+  const ok = admin ? Boolean(got) && crypto.timingSafeEqual(digest(got), digest(admin)) : isLocal(req);
+  if (!ok) return res.status(403).json({ error: admin ? 'Sai mã quản trị.' : 'Chỉ sửa cài đặt được trên máy đang chạy chương trình (hoặc đặt ADMIN_CODE).' });
+  const b = req.body || {};
+  const ds = Array.isArray(b.tieu_chi_trao_quyen) ? b.tieu_chi_trao_quyen.map((x) => String(x || '').trim()).filter(Boolean) : null;
+  if (ds && ds.length !== 6) return res.status(400).json({ error: 'Cần đúng 6 tiêu chí Trao quyền.' });
+  if (ds) {
+    config.tieu_chi_trao_quyen.danh_sach = ds.map((ten, i) => ({ ma: `TQ-${'abcdef'[i]}`, ten }));
+    config.tieu_chi_trao_quyen.da_xac_nhan = true;
+    config.tieu_chi_trao_quyen._GHI_CHU = `Danh sách chính thức do nhà trường/tổ cập nhật ngày ${new Date().toLocaleDateString('vi-VN')}.`;
+  }
+  if (b.diem_muc_tieu !== undefined) config.diem_muc_tieu = Math.max(70, Math.min(100, Number(b.diem_muc_tieu) || 88));
+  if (b.so_vong_tu_sua_toi_da !== undefined) config.so_vong_tu_sua_toi_da = Math.max(0, Math.min(4, Number(b.so_vong_tu_sua_toi_da) || 0));
+  if (b.to_chuyen_mon_mac_dinh !== undefined) config.to_chuyen_mon_mac_dinh = String(b.to_chuyen_mon_mac_dinh).slice(0, 100);
+  if (b.tra_cuu_web !== undefined) config.tra_cuu_web = Boolean(b.tra_cuu_web);
+  try {
+    saveConfig(config);
+  } catch (err) {
+    return res.status(500).json({ error: `Đã áp dụng nhưng không lưu được file cấu hình: ${err.message}` });
+  }
+  res.json({ ok: true });
 });
 
 // Bước 1: tải file lên → đọc, tách tiết, rà soát sơ bộ
@@ -126,8 +160,10 @@ app.post('/api/jobs', (req, res) => {
     parts = [{ so: 1, tieu_de: opts.ten_bai, text: '' }];
   }
   if (!parts.length) return res.status(400).json({ error: 'Chưa chọn tiết nào.' });
-  if (!aiAvailable() && !parts.every((p) => p.khbd) && input.kind === 'none') {
-    return res.status(400).json({ error: 'Máy chủ chưa cấu hình ANTHROPIC_API_KEY nên chưa soạn mới được.' });
+  const userKey = String(req.get('x-claude-key') || '').trim();
+  const jobConfig = userKey ? { ...config, _apiKey: userKey } : config;
+  if (!userKey && !serverKeyAvailable() && input.kind === 'none') {
+    return res.status(400).json({ error: 'Chưa có khoá API Claude — nhập khoá ở mục Cài đặt để soạn mới.' });
   }
   const cleanOpts = {
     truong: config.truong,
@@ -149,7 +185,7 @@ app.post('/api/jobs', (req, res) => {
   const job = new Job();
   jobs.set(job.id, job);
   job.status = 'running';
-  runJob(job, { parts, input, opts: cleanOpts, mode: mode === 'tham_dinh' ? 'tham_dinh' : 'nang_cap', config })
+  runJob(job, { parts, input, opts: cleanOpts, mode: mode === 'tham_dinh' ? 'tham_dinh' : 'nang_cap', config: jobConfig })
     .then((result) => {
       job.result = result;
       job.status = 'done';
@@ -157,8 +193,9 @@ app.post('/api/jobs', (req, res) => {
     })
     .catch((err) => {
       job.status = 'error';
-      console.error(err);
-      job.emit({ type: 'error', msg: err.message || String(err) });
+      console.error(err.message || err);
+      const msg = err?.status === 401 ? 'Khoá API Claude không hợp lệ — kiểm tra lại ở mục Cài đặt.' : err?.status === 429 ? 'Vượt giới hạn tốc độ của khoá API — thử lại sau ít phút.' : err.message || String(err);
+      job.emit({ type: 'error', msg });
     });
   res.json({ job_id: job.id });
 });
@@ -194,5 +231,6 @@ app.get('/api/jobs/:id/files/:name', (req, res) => {
 
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {
-  console.log(`KHBD Việt Anh đang chạy: http://localhost:${port}  (AI: ${aiAvailable() ? 'bật – ' + config.model : 'TẮT – chưa có ANTHROPIC_API_KEY'})`);
+  console.log(`KHBD Việt Anh đang chạy: http://localhost:${port}`);
+  console.log(serverKeyAvailable() ? `AI: dùng khoá của máy chủ (${config.model})` : 'AI: chưa có khoá máy chủ — mỗi người nhập khoá API Claude của mình ở mục Cài đặt trên web.');
 });

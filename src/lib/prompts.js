@@ -26,7 +26,7 @@ ${kb('tieu-chi-active-learning.md')}
 </tieu_chi_active_learning>
 
 <tieu_chi_trao_quyen_ap_dung>
-Tài liệu chỉ nêu "đáp ứng tối thiểu 4/6 tiêu chí trao quyền". Dùng 6 tiêu chí sau (mã TQ-a … TQ-f) khi điền trường tieu_chi_dap_ung:
+${config.tieu_chi_trao_quyen.da_xac_nhan ? '6 tiêu chí trao quyền chính thức của nhà trường' : 'Tài liệu chỉ nêu "đáp ứng tối thiểu 4/6 tiêu chí trao quyền"; dùng danh sách tạm sau'} (mã TQ-a … TQ-f) khi điền trường tieu_chi_dap_ung:
 ${tq}
 </tieu_chi_trao_quyen_ap_dung>
 
@@ -39,7 +39,8 @@ NGUYÊN TẮC KHI SOẠN / NÂNG CẤP
 2. Khi nâng cấp bản gốc: GIỮ ý đồ sư phạm, ngữ liệu, bài tập, đáp án, tên GV của giáo viên; tái cấu trúc và bổ sung để đạt chuẩn. Ghi từng thay đổi quan trọng + lý do (dẫn tiêu chí) vào ghi_chu_thay_doi.
 3. Mô tả HOẠT ĐỘNG của GV và HS, không chép lời thoại dài; HS làm trung tâm; dùng động từ hành động của HS.
 4. Ngôn ngữ: các trường nội dung viết bằng ngôn ngữ ghi ở meta.ngon_ngu_noi_dung (môn ngoại ngữ có thể giữ ngữ liệu, câu hỏi, đáp án bằng tiếng nước ngoài; phần mục tiêu, tổ chức thực hiện vẫn rõ ràng).
-5. Chọn phương pháp (khi được yêu cầu tự chọn): LA cho bài ôn tập/luyện tập có thể phân hoá; CA cho bài có nhiều nội dung/kỹ năng độc lập; SD khi HS có thể chọn phương án/giải pháp rồi so sánh; CT khi có vấn đề cần phân tích nhiều khía cạnh để ra quyết định; THUONG khi không phương pháp nào phù hợp tự nhiên. Ghi lý do vào meta.ly_do_chon_phuong_phap.
+5. Hình ảnh: ký hiệu [HÌNH n] trong bản gốc là hình minh hoạ của giáo viên. Giữ NGUYÊN ký hiệu đó (đúng số) ở vị trí tương ứng trong bản mới (vd trong noi_dung của hoạt động dạy từ vựng có dùng tranh). Không tự tạo ký hiệu [HÌNH n] mới.
+6. Chọn phương pháp (khi được yêu cầu tự chọn): LA cho bài ôn tập/luyện tập có thể phân hoá; CA cho bài có nhiều nội dung/kỹ năng độc lập; SD khi HS có thể chọn phương án/giải pháp rồi so sánh; CT khi có vấn đề cần phân tích nhiều khía cạnh để ra quyết định; THUONG khi không phương pháp nào phù hợp tự nhiên. Ghi lý do vào meta.ly_do_chon_phuong_phap.
 
 DANH MỤC BẮT BUỘC ĐỂ ĐẠT (bộ kiểm tra tự động sẽ soát từng mục — thiếu mục nào sẽ bị trả lại):
 A. Khung mẫu (Bước 1)
