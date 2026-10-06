@@ -1,13 +1,16 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { PHUONG_PHAP } from './schema.js';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const kb = (f) => fs.readFileSync(path.join(here, '..', 'knowledge', f), 'utf8');
+// Bỏ các mục vận hành (nộp theo tuần, Google Drive, sổ theo dõi, định dạng đầu ra của skill)
+// khỏi quy trình thẩm định: không liên quan tới việc soạn/chấm, chỉ làm prompt dài thêm.
+export function trimQuyTrinh(text) {
+  const i = text.indexOf('# ĐƠN VỊ NỘP KHBD');
+  return i > 0 ? text.slice(0, i).trimEnd() : text;
+}
 
+// kb: { kienThuc, quyTrinh, activeLearning } — nội dung 3 tài liệu chuẩn (Node đọc từ đĩa, trình duyệt nhúng sẵn).
 // Nội dung ổn định → đặt đầu system prompt để tận dụng prompt caching.
-export function buildSystemPrompt(config) {
+export function buildSystemPrompt(config, kbText) {
+  const kb = (f) => ({ 'kien-thuc-nen.md': kbText.kienThuc, 'quy-trinh-tham-dinh.md': trimQuyTrinh(kbText.quyTrinh), 'tieu-chi-active-learning.md': kbText.activeLearning })[f];
   const tq = config.tieu_chi_trao_quyen.danh_sach.map((x) => `- ${x.ma}: ${x.ten}`).join('\n');
   return `Bạn là chuyên gia thiết kế Kế hoạch bài dạy (KHBD) của ${config.truong}, đồng thời là chuyên viên thẩm định của tổ chuyên môn. Bạn soạn/nâng cấp KHBD sao cho ĐẠT TOÀN BỘ tiêu chí thẩm định chính thức (thang /100, mã lỗi P1/P2/P3) mà vẫn khả thi khi lên lớp, bám chương trình GDPT 2018, Công văn 5512 (Phụ lục IV) và văn hoá TLIM / 5 giá trị cốt lõi của trường.
 

@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node --test test/*.test.js",
-    "sample": "node scripts/render-sample.js"
+    "sample": "node scripts/render-sample.js",
+    "build:web": "node scripts/build-web.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -22,5 +23,8 @@
     "mammoth": "^1.13.0",
     "multer": "^2.4.0",
     "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

@@ -52,6 +52,15 @@ Rà soát sơ bộ bản gốc ─► Tra cứu web ─► Claude soạn/nâng c
 10. **⚙ Cài đặt trên web**: nhập khoá API Claude (lưu trên trình duyệt của từng máy), sửa **6 tiêu chí Trao quyền**, điểm mục tiêu, số vòng tự sửa, tổ chuyên môn mặc định.
 11. Hiển thị tiến trình trực tiếp; mã truy cập tuỳ chọn; giới hạn số job chạy đồng thời. Làm việc hoàn toàn bằng **tải file lên – tải file về**, không cần Google Drive.
 
+## Bản web dùng ngay trên claude.ai (không cần cài đặt, không cần khoá API)
+
+Đã đăng tại **https://claude.ai/artifact/PXU57eEkBH4MhmBPATsWKh** (mặc định chỉ chủ sở hữu mở được — chia sẻ cho giáo viên trong tổ bằng menu **Share** của trang).
+
+- Chạy hoàn toàn trong trình duyệt; gọi Claude qua tài khoản claude.ai của chính người dùng (lần chạy đầu sẽ hỏi cho phép), tải file Word về qua hộp thoại lưu của claude.ai.
+- Cùng bộ kiểm tra quy tắc, prompt, schema và bộ xuất Word với bản máy chủ; mỗi tiết gọi Claude 2 phần (mục tiêu – rubric – dàn ý, rồi tiến trình chi tiết) + 1 lần chấm, các vòng tự sửa chỉ gửi lại phần cần sửa.
+- Khác bản máy chủ: **không tra cứu web** (chi tiết SGK/YCCĐ chưa chắc chắn được đánh dấu đỏ để GV kiểm tra), chưa đọc PDF (lưu thành .docx), cài đặt 6 tiêu chí Trao quyền lưu trên trình duyệt từng máy.
+- Mã nguồn: `web-artifact/` · đóng gói lại: `npm run build:web` → `web-artifact/dist/`.
+
 ## Cách dùng trên máy cá nhân (không cần máy chủ)
 
 1. Cài **Node.js bản LTS** tại https://nodejs.org (một lần).

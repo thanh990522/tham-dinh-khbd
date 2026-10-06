@@ -270,11 +270,14 @@ const pageLandscape = () => ({ page: { size: { width: 11906, height: 16838, orie
 const docStyles = { default: { document: { run: { font: FONT, size: 26 } } } };
 
 // images: [{n, type, data, width, height}] của file gốc; refs[i]: các số hình thuộc tiết thứ i
-export async function renderKHBDDocx(list, config, { images = [], refs = [] } = {}) {
+export function buildKHBDDocument(list, config, { images = [], refs = [] } = {}) {
   IMAGES = new Map(images.map((im) => [im.n, im]));
   const sections = list.flatMap((k, i) => khbdSections(k, config, refs[i]));
-  const doc = new Document({ creator: config.truong, title: list.map((k) => k.meta.ten_bai).join(' | '), styles: docStyles, sections });
-  return Packer.toBuffer(doc);
+  return new Document({ creator: config.truong, title: list.map((k) => k.meta.ten_bai).join(' | '), styles: docStyles, sections });
+}
+
+export async function renderKHBDDocx(list, config, opts) {
+  return Packer.toBuffer(buildKHBDDocument(list, config, opts));
 }
 
 // ───────── BÁO CÁO THẨM ĐỊNH ─────────
@@ -359,7 +362,11 @@ function reportForResult(r, i, total, { config, mode }) {
   return out;
 }
 
-export async function renderReportDocx(results, { config, mode }) {
+export async function renderReportDocx(results, opts) {
+  return Packer.toBuffer(buildReportDocument(results, opts));
+}
+
+export function buildReportDocument(results, { config, mode }) {
   const children = [
     para([run(config.truong.toUpperCase(), { bold: true })], { align: AlignmentType.CENTER }),
     para([run('BÁO CÁO THẨM ĐỊNH KẾ HOẠCH BÀI DẠY', { bold: true, size: 32 })], { align: AlignmentType.CENTER, before: 120 }),
@@ -372,6 +379,5 @@ export async function renderReportDocx(results, { config, mode }) {
     children.push(...reportForResult(r, i, results.length, { config, mode }));
   });
   children.push(para([run(`Người chấm: Hệ thống hỗ trợ (AI + bộ kiểm tra quy tắc) — TTCM xác nhận: ……………………   Ngày: ${new Date().toLocaleDateString('vi-VN')}`, { italics: true, size: 22 })], { before: 300 }));
-  const doc = new Document({ creator: config.truong, title: 'Báo cáo thẩm định KHBD', styles: docStyles, sections: [{ properties: pagePortrait(), children }] });
-  return Packer.toBuffer(doc);
+  return new Document({ creator: config.truong, title: 'Báo cáo thẩm định KHBD', styles: docStyles, sections: [{ properties: pagePortrait(), children }] });
 }
