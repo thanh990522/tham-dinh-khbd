@@ -119,6 +119,10 @@ export const KHBD_SCHEMA = obj(
         nang_luc_chung: arr(mucTieu, 'I.2 Năng lực chung (tự chủ & tự học, giao tiếp & hợp tác, GQVĐ & sáng tạo)'),
         nang_luc_dac_thu: arr(mucTieu, 'I.2 Năng lực đặc thù môn học'),
         pham_chat: arr(mucTieu, 'I.3 Phẩm chất (GDPT 2018: yêu nước, nhân ái, chăm chỉ, trung thực, trách nhiệm)'),
+        active_learning: arr(
+          mucTieu,
+          'I.6 Active Learning — 1–2 mục tiêu (id ACT1, ACT2) nêu đo được HS CHỦ ĐỘNG làm gì: tỉ lệ thời gian HS hoạt động, mức ICAP Kiến tạo/Tương tác, hợp tác có phân vai, tự kiểm tra hiểu; mỗi mục phải nằm trong muc_tieu_ids của hoạt động thực hiện nó'
+        ),
         tlim: arr(
           obj(
             {

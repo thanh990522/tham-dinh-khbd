@@ -49,7 +49,7 @@ VĂN PHONG NGẮN GỌN (bắt buộc — KHBD dùng để dạy, không phải 
 - Viết kiểu ghi chú hành động: động từ + đối tượng, bỏ câu dẫn, bỏ từ đệm ("nhằm giúp các em", "một cách tích cực", "GV yêu cầu HS hãy…"). Được dùng "GV", "HS", dấu "→", dấu ";".
 - KHÔNG LẶP: mỗi ý chỉ viết một lần ở đúng chỗ của nó. to_chuc không chép lại noi_dung; muc_tieu_hoat_dong không chép lại mục tiêu phần I (chỉ ghi ngắn điều hoạt động đạt được, mã mục tiêu đã có trong muc_tieu_ids); không nhắc lại tên mã (KT1, TL1…) trong câu văn; bo_cau_hoi_dinh_huong không chép lại định hướng phương án đã có ở dac_thu_phuong_phap.
 - Giới hạn độ dài (không tính ngữ liệu/đáp án ngoại ngữ giữ từ bản gốc):
-  • Mỗi mục tiêu ≤ 20 từ. Số lượng: kien_thuc ≤ 3, nang_luc_chung ≤ 2, nang_luc_dac_thu ≤ 2, pham_chat ≤ 2, trao_quyen ≤ 3.
+  • Mỗi mục tiêu ≤ 20 từ. Số lượng: kien_thuc ≤ 3, nang_luc_chung ≤ 2, nang_luc_dac_thu ≤ 2, pham_chat ≤ 2, trao_quyen ≤ 3, active_learning 1–2.
   • TLIM/giá trị: cong_cu ≤ 8 từ; hanh_vi_quan_sat ≤ 18 từ.
   • thiet_bi_hoc_lieu ≤ 6 dòng, mỗi dòng ≤ 10 từ.
   • Hoạt động: ten ≤ 8 từ; muc_tieu_hoat_dong ≤ 15 từ; noi_dung ≤ 35 từ; san_pham ≤ 30 từ (đáp án ngắn gọn dạng 1. … 2. …); mỗi bước to_chuc ≤ 20 từ; phan_vai mỗi vai ≤ 10 từ; kiem_tra_hieu_bai.cong_cu ≤ 15 từ, cach_dieu_chinh ≤ 12 từ; ho_tro_hs ≤ 15 từ. Không dùng hoạt động nào thì để chuỗi rỗng cho trường không bắt buộc (dung_ai…).
@@ -73,6 +73,7 @@ A. Khung mẫu (Bước 1)
   - Yếu tố đặc thù: LA ≥3 cấp độ, mỗi cấp có mục tiêu riêng (chia sẻ đầu bài), nhiệm vụ + lời giải, ngưỡng lên cấp; CA 2–3 chủ đề; CT điền đủ PRAAD; SD ≥2 phương án có định hướng + yeu_cau_so_sanh + hinh_thuc_same_different. Các khối không dùng để rỗng.
 B. Thời gian (Bước 4): tổng thoi_gian_phut = 45 × số tiết, CHÍNH XÁC; phân bổ hợp lý.
 C. Nhất quán (Bước 5): MỌI id mục tiêu (KT, NLC, NLDT, PC, TL, GT, TQ) đều xuất hiện trong muc_tieu_ids / tlim_ids / gia_tri_ids / trao_quyen_ids của ít nhất một hoạt động có nhiệm vụ thực sự thực hiện nó; mọi hoạt động (trừ chiêm nghiệm, củng cố) có muc_tieu_ids hợp lệ. Không có hoạt động "lạc".
+D0. Mục tiêu Active Learning (I.6, muc_tieu.active_learning): 1–2 mục tiêu id ACT1, ACT2, viết đo được theo 4 dấu hiệu Bước 7.D1 và khung ICAP — vd "HS trực tiếp làm/nói/tạo sản phẩm ≥ 70% thời lượng", "HS tương tác nhóm có phân vai, phản biện chéo (mức Tương tác)". Mỗi id ACT phải có trong muc_tieu_ids của các hoạt động thực hiện nó; nội dung phải khớp đúng dữ liệu tiến trình (số phút, hình thức, phân vai, muc_icap).
 D. Active Learning (Bước 7.D1): phút HS hoạt động (thoi_gian_phut − phut_gv_thuyet_giang) ≥ 60% tổng; phut_gv_thuyet_giang ≤ 10 ở mọi hoạt động; thuc_hien_nhiem_vu mô tả HS làm gì; ≥1 hoạt động cap_doi/nhom có phan_vai ≥2 vai, mỗi vai có việc cụ thể; ≥1 hoạt động GIỮA BÀI có kiem_tra_hieu_bai.co=true với công cụ cụ thể và cách điều chỉnh; ít nhất 1 hoạt động đạt mức ICAP constructive/interactive và Bloom ≥ phân tích.
 E. 5 Giá trị & 7 Thói quen (Bước 7.D2): TỔNG số TLIM + giá trị cốt lõi là 1 hoặc 2 (chọn ít mà sâu), đúng tên + số thứ tự; mỗi mục có công cụ (với TLIM) và hanh_vi_quan_sat, được gắn vào hoạt động cụ thể; hoạt động chiêm nghiệm có câu hỏi với cham_vao_ids trỏ tới mục đó; có một dòng rubric với lien_ket_muc_tieu chứa id mục đó.
 F. Trao quyền (4PP): các mục trao quyền được gắn vào hoạt động, và hợp lại đáp ứng ≥4 tiêu chí TQ-a…TQ-f.

@@ -4,6 +4,7 @@ import {
   Table, TableCell, TableRow, TextRun, WidthType, VerticalAlign, PageOrientation, ImageRun, LineRuleType,
 } from 'docx';
 import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from './schema.js';
+import { evidence, activityTags } from './active-learning.js';
 
 const FONT = 'Times New Roman';
 const CONTENT_W = 9355; // A4, lề trái 3cm, phải 1.5cm (twip)
@@ -13,7 +14,7 @@ const LAND_W = 14400; // A4 ngang cho bảng 3 cột
 // Ảnh từ giáo án gốc: ký hiệu [HÌNH n] trong văn bản được thay bằng ảnh thật khi xuất.
 let IMAGES = new Map();
 const MAX_IMG_W = 160; // px
-const run = (text, o = {}) => new TextRun({ text: String(text ?? ''), font: FONT, size: o.size || 26, bold: o.bold, italics: o.italics, color: o.color });
+const run = (text, o = {}) => new TextRun({ text: String(text ?? ''), font: FONT, size: o.size || 26, bold: o.bold, italics: o.italics, color: o.color, highlight: o.highlight });
 function imageRun(n) {
   const img = IMAGES.get(n);
   if (!img) return run(`(hình ${n} trong giáo án gốc)`, { italics: true, size: 22 });
@@ -101,12 +102,12 @@ function mucTieuKHBD(k) {
   const out = [h('I. MỤC TIÊU'), h('1. Về kiến thức', 2), ...items(mt.kien_thuc), h('2. Về năng lực', 2), para([run('a) Năng lực chung:', { italics: true, bold: true })]), ...items(mt.nang_luc_chung), para([run('b) Năng lực đặc thù:', { italics: true, bold: true })]), ...items(mt.nang_luc_dac_thu), h('3. Về phẩm chất', 2), ...items(mt.pham_chat)];
   const tlim = mt.tlim.map((t) => bullet([run(`[${t.id}] Thói quen ${t.thoi_quen_so} – ${t.ten_thoi_quen || THOI_QUEN[t.thoi_quen_so]}`, { bold: true }), run(` · Công cụ: ${t.cong_cu} · Biểu hiện: ${t.hanh_vi_quan_sat}`)]));
   const gt = mt.gia_tri_cot_loi.map((g) => bullet([run(`[${g.id}] Giá trị ${g.gia_tri_so} – ${g.ten_gia_tri || GIA_TRI[g.gia_tri_so]}`, { bold: true }), run(` · Biểu hiện: ${g.hanh_vi_quan_sat}`)]));
-  if (is4PP || tlim.length || gt.length) {
-    out.push(h('4. TLIM & Giá trị cốt lõi', 2), ...tlim, ...gt);
-  }
-  if (is4PP || mt.trao_quyen.length) {
-    out.push(h('5. Trao quyền', 2), ...mt.trao_quyen.map((t) => bullet([run(`[${t.id}] `, { bold: true }), run(t.noi_dung)])));
-  }
+  let n = 3;
+  if (is4PP || tlim.length || gt.length) out.push(h(`${++n}. TLIM & Giá trị cốt lõi`, 2), ...tlim, ...gt);
+  if (is4PP || mt.trao_quyen.length) out.push(h(`${++n}. Trao quyền`, 2), ...mt.trao_quyen.map((t) => bullet([run(`[${t.id}] `, { bold: true }), run(t.noi_dung)])));
+  out.push(h(`${++n}. Active Learning`, 2), ...items(mt.active_learning || []));
+  out.push(para([run(' Minh chứng trong tiến trình ', { bold: true, size: 24, highlight: 'yellow' })], { indent: 284, keepNext: true }));
+  evidence(k).forEach((e) => out.push(bullet([run(e.ok ? '✓ ' : '✗ ', { bold: true, size: 24, color: e.ok ? '2E7D32' : 'C00000' }), run(e.text, { size: 24 })], { indent: 568 })));
   return out;
 }
 
@@ -184,6 +185,11 @@ function rubricKHBD(k) {
 
 const HINH_THUC = { ca_nhan: 'Cá nhân', cap_doi: 'Cặp đôi', nhom: 'Nhóm', ca_lop: 'Cả lớp' };
 
+const alLine = (a, size) => {
+  const tags = activityTags(a);
+  return tags.length ? [para([run(' Active Learning: ', { bold: true, size, highlight: 'yellow' }), run(` ${tags.join(' · ')}`, { size, italics: true })])] : [];
+};
+
 function chiTietToChuc(a, size = 24) {
   const t = a.to_chuc;
   const out = [
@@ -209,7 +215,7 @@ function tienTrinh4PP(k) {
   const rows = [headerRow(['CÁC HOẠT ĐỘNG', 'NỘI DUNG – SẢN PHẨM', 'MỤC TIÊU (+ Thời gian)'])];
   for (const a of k.hoat_dong) {
     rows.push([
-      [para([run(`${a.id}. ${a.ten}`, { bold: true, size: 24 })]), para([run(`${TEN_BUOC_4PP[a.buoc_4pp]} · ${HINH_THUC[a.hinh_thuc]}`, { italics: true, size: 22 })]), ...chiTietToChuc(a)],
+      [para([run(`${a.id}. ${a.ten}`, { bold: true, size: 24 })]), para([run(`${TEN_BUOC_4PP[a.buoc_4pp]} · ${HINH_THUC[a.hinh_thuc]}`, { italics: true, size: 22 })]), ...alLine(a, 22), ...chiTietToChuc(a)],
       [label('Nội dung: ', a.noi_dung, { size: 24 }), label('Sản phẩm: ', a.san_pham, { size: 24 }), ...(a.rubric_ids.length ? [para([run(`Đánh giá theo ${a.rubric_ids.join(', ')}`, { italics: true, size: 22 })])] : [])],
       [para([run(a.muc_tieu_hoat_dong, { size: 24 }), run(` (${lienKet(a)})`, { italics: true, size: 22 })]), para([run(`${a.thoi_gian_phut} phút`, { bold: true, size: 24 })])],
     ]);
@@ -220,7 +226,7 @@ function tienTrinh4PP(k) {
 function tienTrinhThuong(k) {
   const out = [h('III. TIẾN TRÌNH DẠY HỌC')];
   k.hoat_dong.forEach((a, i) => {
-    out.push(h(`Hoạt động ${i + 1}: ${a.ten} — ${TEN_LOAI_HOAT_DONG[a.loai]} (${a.thoi_gian_phut} phút)`, 2));
+    out.push(h(`Hoạt động ${i + 1}: ${a.ten} — ${TEN_LOAI_HOAT_DONG[a.loai]} (${a.thoi_gian_phut} phút)`, 2), ...alLine(a, 24));
     out.push(label('a) Mục tiêu: ', `${a.muc_tieu_hoat_dong} (${lienKet(a)})`));
     out.push(label('b) Nội dung: ', a.noi_dung));
     out.push(label('c) Sản phẩm: ', a.san_pham + (a.rubric_ids.length ? ` — đánh giá theo rubric ${a.rubric_ids.join(', ')}` : '')));

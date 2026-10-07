@@ -1,6 +1,9 @@
 // Bản HTML của KHBD (cùng bố cục với file Word) — để xem trước trên trang và sao chép dán vào Word.
 // Dùng style nội tuyến vì khi dán, Word giữ style nội tuyến tốt nhất.
 import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from '../../src/lib/schema.js';
+import { evidence, activityTags } from '../../src/lib/active-learning.js';
+
+const HL = 'background:#ffeb3b;color:#000;padding:0 2px;';
 
 const F = "font-family:'Times New Roman',Times,serif;font-size:13pt;line-height:1.4;color:#000;";
 const TD = 'border:1px solid #808080;padding:4px 6px;vertical-align:top;font-size:12pt;';
@@ -46,15 +49,19 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
 
     const items = (arr) => arr.map((x) => li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}`)).join('');
     out.push(h('I. MỤC TIÊU'), h('1. Về kiến thức', 2), items(mt.kien_thuc), h('2. Về năng lực', 2), p('<b><i>a) Năng lực chung:</i></b>'), items(mt.nang_luc_chung), p('<b><i>b) Năng lực đặc thù:</i></b>'), items(mt.nang_luc_dac_thu), h('3. Về phẩm chất', 2), items(mt.pham_chat));
+    let num = 3;
     if (is4PP || mt.tlim.length || mt.gia_tri_cot_loi.length) {
-      out.push(h('4. TLIM & Giá trị cốt lõi', 2));
+      out.push(h(`${++num}. TLIM & Giá trị cốt lõi`, 2));
       mt.tlim.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Thói quen ${esc(x.thoi_quen_so)} – ${esc(x.ten_thoi_quen || THOI_QUEN[x.thoi_quen_so])}</b> · Công cụ: ${t(x.cong_cu)} · Biểu hiện: ${t(x.hanh_vi_quan_sat)}`)));
       mt.gia_tri_cot_loi.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Giá trị ${esc(x.gia_tri_so)} – ${esc(x.ten_gia_tri || GIA_TRI[x.gia_tri_so])}</b> · Biểu hiện: ${t(x.hanh_vi_quan_sat)}`)));
     }
     if (is4PP || mt.trao_quyen.length) {
-      out.push(h('5. Trao quyền', 2));
+      out.push(h(`${++num}. Trao quyền`, 2));
       mt.trao_quyen.forEach((x) => out.push(li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}`)));
     }
+    out.push(h(`${++num}. Active Learning`, 2), items(mt.active_learning || []));
+    out.push(p(`<b style="${HL}">Minh chứng trong tiến trình</b>`, 'margin-left:14pt;'));
+    evidence(k).forEach((e) => out.push(p(`<b style="color:${e.ok ? '#2e7d32' : '#c00000'}">${e.ok ? '✓' : '✗'}</b> ${esc(e.text)}`, 'margin-left:28pt;font-size:12pt;')));
 
     const tb = (ai) => k.thiet_bi_hoc_lieu.filter((x) => x.doi_tuong === ai).map((x) => `${t(x.ten)}${x.dung_cho_hoat_dong.length ? ` (${esc(x.dung_cho_hoat_dong.join(', '))})` : ''}`).join('; ');
     out.push(h('II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU'), ...['GV', 'HS'].filter((ai) => tb(ai)).map((ai) => lb(`${ai === 'GV' ? 'Giáo viên' : 'Học sinh'}: `, tb(ai))));
@@ -112,7 +119,8 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
 
     const toChuc = (a) => {
       const c = a.to_chuc;
-      const x = [lb('B1 Giao nhiệm vụ: ', t(c.giao_nhiem_vu)), lb('B2 Thực hiện: ', t(c.thuc_hien_nhiem_vu)), lb('B3 Báo cáo, thảo luận: ', t(c.bao_cao_thao_luan)), lb('B4 Kết luận: ', t(c.ket_luan_nhan_dinh))];
+      const tags = activityTags(a);
+      const x = [tags.length ? p(`<b style="${HL}">Active Learning:</b> <i>${esc(tags.join(' · '))}</i>`, 'font-size:11pt;') : '', lb('B1 Giao nhiệm vụ: ', t(c.giao_nhiem_vu)), lb('B2 Thực hiện: ', t(c.thuc_hien_nhiem_vu)), lb('B3 Báo cáo, thảo luận: ', t(c.bao_cao_thao_luan)), lb('B4 Kết luận: ', t(c.ket_luan_nhan_dinh))];
       if (a.phan_vai.length) x.push(lb('Phân vai: ', t(a.phan_vai.map((v) => `${v.vai}: ${v.nhiem_vu}`).join('; '))));
       if (a.kiem_tra_hieu_bai.co) x.push(lb('Kiểm tra nhanh: ', t(`${a.kiem_tra_hieu_bai.cong_cu}${a.kiem_tra_hieu_bai.cach_dieu_chinh ? ` → ${a.kiem_tra_hieu_bai.cach_dieu_chinh}` : ''}`)));
       if (a.ho_tro_hs) x.push(lb('Hỗ trợ: ', t(a.ho_tro_hs)));

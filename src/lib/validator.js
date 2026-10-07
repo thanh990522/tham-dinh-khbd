@@ -149,7 +149,7 @@ export function validateKHBD(k, opts = {}) {
 
   // ───────────────────────── BƯỚC 5 — NHẤT QUÁN MỤC TIÊU ↔ HOẠT ĐỘNG ─────────────────────────
   const allMT = [
-    ...mt.kien_thuc, ...mt.nang_luc_chung, ...mt.nang_luc_dac_thu, ...mt.pham_chat,
+    ...mt.kien_thuc, ...mt.nang_luc_chung, ...mt.nang_luc_dac_thu, ...mt.pham_chat, ...(mt.active_learning || []),
   ].map((m) => ({ id: m.id, noi_dung: m.noi_dung }));
   const tlimIds = mt.tlim.map((t) => t.id);
   const gtIds = mt.gia_tri_cot_loi.map((g) => g.id);
@@ -194,6 +194,7 @@ export function validateKHBD(k, opts = {}) {
   const kiemTraGiua = hd.filter((a, i) => a.kiem_tra_hieu_bai.co && !blank(a.kiem_tra_hieu_bai.cong_cu) && !cuoi.has(a.loai) && i < viTriCuoi - 1);
   if (kiemTraGiua.length === 0) d1Missing.push('DH4: ≥1 điểm kiểm tra mức hiểu giữa bài (câu hỏi nhanh, thẻ thoát, bảng trắng...)');
   const d1 = d7Score(d1Missing);
+  if (!(mt.active_learning || []).length) add('P2', 'Bước 7', 'AL-MT', 'Chưa có mục tiêu Active Learning (I.6).', 'Thêm 1–2 mục tiêu ACT nêu rõ HS chủ động làm gì và gắn vào hoạt động thực hiện.');
   if (tiLeHS < 0.3) add('P1', 'Bước 7', 'AL-30', `Tỉ lệ HS hoạt động chỉ ${(tiLeHS * 100).toFixed(0)}% (<30%) — tiết thuyết giảng một chiều.`, 'Chuyển phần GV giảng thành nhiệm vụ HS thực hiện (cặp/nhóm, sản phẩm), GV chốt ngắn.');
   else if (tiLeHS < 0.5) add('P2', 'Bước 7', 'AL-50', `Tỉ lệ HS hoạt động ${(tiLeHS * 100).toFixed(0)}% (30–49%).`, 'Tăng thời lượng HS làm/nói/thảo luận lên ≥50%.');
   for (const a of giangDai) add('P2', 'Bước 7', 'AL-10P', `${a.id}: GV giảng liên tục ${a.phut_gv_thuyet_giang} phút (>10).`, 'Chia nhỏ phần giảng, xen nhiệm vụ HS.');

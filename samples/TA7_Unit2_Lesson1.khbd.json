@@ -114,6 +114,16 @@
         "cap_bac": "Phát triển",
         "hanh_vi_quan_sat": "Mỗi HS làm đúng vai, ghi tên phần việc, cam kết 1 hành động sống khoẻ."
       }
+    ],
+    "active_learning": [
+      {
+        "id": "ACT1",
+        "noi_dung": "HS trực tiếp làm, nói, tạo sản phẩm ≥ 70% thời lượng tiết học."
+      },
+      {
+        "id": "ACT2",
+        "noi_dung": "HS tương tác nhóm có phân vai: khảo sát, xếp hạng, chấm chéo (mức Tương tác)."
+      }
     ]
   },
   "thiet_bi_hoc_lieu": [
@@ -385,7 +395,8 @@
       "phut_gv_thuyet_giang": 3,
       "muc_tieu_ids": [
         "KT1",
-        "NLDT1"
+        "NLDT1",
+        "ACT1"
       ],
       "muc_tieu_hoat_dong": "Hiểu 3 từ mới; nghe – đọc hội thoại.",
       "noi_dung": "Đoán nghĩa popular (trái nghĩa), fresh [HÌNH 1], join [HÌNH 2]; cặp trả lời 4 câu về tranh; nghe – đọc, gạch chân từ về sức khoẻ.",
@@ -431,7 +442,8 @@
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
         "NLDT1",
-        "KT1"
+        "KT1",
+        "ACT1"
       ],
       "muc_tieu_hoat_dong": "Nắm ý chính; nhận diện từ qua tranh.",
       "noi_dung": "Bài 2: chọn A/B/C, giải thích loại phương án. Bài 3: viết từ dưới tranh.",
@@ -477,7 +489,8 @@
       "phut_gv_thuyet_giang": 0,
       "muc_tieu_ids": [
         "KT1",
-        "NLDT1"
+        "NLDT1",
+        "ACT1"
       ],
       "muc_tieu_hoat_dong": "Dùng từ trong ngữ cảnh câu.",
       "noi_dung": "Hoàn thành 5 câu bằng từ trong hội thoại.",
@@ -518,7 +531,9 @@
         "NLC1",
         "NLC2",
         "NLDT2",
-        "PC1"
+        "PC1",
+        "ACT1",
+        "ACT2"
       ],
       "muc_tieu_hoat_dong": "Khảo sát, chọn phương án, lập kế hoạch có ưu tiên.",
       "noi_dung": "Mỗi HS nêu 2 hoạt động → nhóm hỏi How often/Good or bad/Why; chọn 1 phương án; viết ≥3 lời khuyên; xếp hạng, chọn \"hòn đá lớn\"; làm poster.",
@@ -582,7 +597,9 @@
       "muc_tieu_ids": [
         "NLDT2",
         "NLC1",
-        "KT2"
+        "KT2",
+        "ACT1",
+        "ACT2"
       ],
       "muc_tieu_hoat_dong": "Trình bày, đánh giá chéo, so sánh phương án.",
       "noi_dung": "Reporter trình bày 1 phút; nhóm bạn hỏi 1 câu, chấm R1; lớp điền Sơ đồ Venn.",

@@ -143,3 +143,26 @@ test('tổng hợp điểm /100 với phiếu chấm AI, lấy điểm thấp h�
   const s2 = tongHopDiem(v, { ...grade, van_de_chuyen_mon: [{ muc_do: 'P1', vi_tri: 'HD3', van_de: 'Đáp án sai', de_xuat_sua: 'Sửa' }] });
   assert.match(s2.ket_luan, /NỘP LẠI BẢN V2/);
 });
+
+test('mục tiêu Active Learning: thiếu → P2; nêu nhưng không hoạt động nào thực hiện → P1', () => {
+  const k = sample();
+  k.muc_tieu.active_learning = [];
+  assert.ok(codes(validateKHBD(k, { config })).includes('P2:AL-MT'));
+  const k2 = sample();
+  for (const a of k2.hoat_dong) a.muc_tieu_ids = a.muc_tieu_ids.filter((x) => x !== 'ACT2');
+  assert.ok(codes(validateKHBD(k2, { config })).includes('P1:NQ-BORoi'));
+});
+
+test('minh chứng Active Learning tính từ tiến trình và thẻ highlight từng hoạt động', async () => {
+  const { evidence, activityTags } = await import('../src/lib/active-learning.js');
+  const k = sample();
+  const ev = evidence(k);
+  assert.equal(ev.length, 5);
+  assert.ok(ev.every((e) => e.ok));
+  assert.match(ev[0].text, /35\/45 phút \(78%\)/);
+  assert.match(ev[2].text, /HD5/);
+  assert.match(ev[3].text, /HD2, HD3/);
+  assert.deepEqual(activityTags(k.hoat_dong.find((a) => a.id === 'HD5')), ['ICAP Tương tác', 'Nhóm có phân vai', 'Tư duy bậc cao']);
+  k.hoat_dong.forEach((a) => { a.phut_gv_thuyet_giang = a.thoi_gian_phut; });
+  assert.equal(evidence(k)[0].ok, false);
+});
