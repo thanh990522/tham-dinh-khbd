@@ -166,3 +166,26 @@ test('minh chứng Active Learning tính từ tiến trình và thẻ highlight 
   k.hoat_dong.forEach((a) => { a.phut_gv_thuyet_giang = a.thoi_gian_phut; });
   assert.equal(evidence(k)[0].ok, false);
 });
+
+test('tự sắp xếp: đúng trình tự, đánh số lại, cân 45 phút, giới hạn GV giảng, dọn trùng', async () => {
+  const { arrangeKHBD } = await import('../src/lib/arrange.js');
+  const k = sample();
+  // xáo trộn: đưa Chiêm nghiệm lên đầu, lệch thời gian, GV giảng quá dài, câu hỏi trùng
+  const cn = k.hoat_dong.findIndex((a) => a.loai === 'chiem_nghiem');
+  k.hoat_dong.unshift(k.hoat_dong.splice(cn, 1)[0]);
+  k.hoat_dong[1].thoi_gian_phut += 7;
+  k.hoat_dong[2].phut_gv_thuyet_giang = 15;
+  k.bo_cau_hoi_dinh_huong.nhom[0].cau_hoi.push({ ...k.bo_cau_hoi_dinh_huong.nhom[0].cau_hoi[0] });
+  const before = k.hoat_dong.map((a) => a.id);
+  const r = arrangeKHBD(k, config);
+  assert.deepEqual(r.hoat_dong.map((a) => a.id), r.hoat_dong.map((_, i) => `HD${i + 1}`));
+  assert.deepEqual(r.hoat_dong.slice(-2).map((a) => a.loai), ['chiem_nghiem', 'cung_co']);
+  assert.equal(r.hoat_dong.reduce((s, a) => s + a.thoi_gian_phut, 0), 45);
+  assert.ok(r.hoat_dong.every((a) => a.phut_gv_thuyet_giang <= 10 && a.phut_gv_thuyet_giang <= a.thoi_gian_phut));
+  assert.equal(r.bo_cau_hoi_dinh_huong.nhom[0].cau_hoi.length, sample().bo_cau_hoi_dinh_huong.nhom[0].cau_hoi.length);
+  // tham chiếu thiết bị/rubric vẫn trỏ đúng hoạt động sau khi đánh số lại
+  const posterAct = r.hoat_dong.find((a) => /Production/.test(a.ten));
+  assert.ok(r.rubric[0].ap_dung_cho.includes(posterAct.id));
+  assert.notDeepEqual(before, r.hoat_dong.map((a) => a.id));
+  assert.deepEqual(validateKHBD(r, { config }).issues, []);
+});

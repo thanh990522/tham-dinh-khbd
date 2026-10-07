@@ -6,6 +6,7 @@ import { Packer } from 'docx';
 import { KHBD_SCHEMA, GRADE_SCHEMA } from '../../src/lib/schema.js';
 import { fillBySchema } from '../../src/lib/fill.js';
 import { validateKHBD, tongHopDiem } from '../../src/lib/validator.js';
+import { arrangeKHBD } from '../../src/lib/arrange.js';
 import { buildSystemPrompt, buildMetaBlock } from '../../src/lib/prompts.js';
 import { htmlToText, splitLessons, preAudit, imageRefs } from '../../src/lib/parse-input.js';
 import { buildKHBDDocument } from '../../src/lib/render-docx.js';
@@ -167,7 +168,7 @@ async function revise({ sample, opts, khbd, issues, g, signal, stage }) {
 export async function upgradeLesson({ sample, opts, part, signal, stage }) {
   const target = config.diem_muc_tieu;
   const passed = (s, v) => !s.co_p1 && s.diem_100 >= target && !v.issues.some((i) => i.muc_do === 'P1' || i.muc_do === 'P2');
-  let khbd = await generate({ sample, opts, part, signal, stage });
+  let khbd = arrangeKHBD(await generate({ sample, opts, part, signal, stage }), config);
   const history = [];
   let v;
   let s;
@@ -177,7 +178,7 @@ export async function upgradeLesson({ sample, opts, part, signal, stage }) {
     s = tongHopDiem(v, g);
     history.push(s.diem_100);
     if (passed(s, v) || vong >= config.so_vong_tu_sua_toi_da) break;
-    khbd = await revise({ sample, opts, khbd, issues: v.issues, g, signal, stage });
+    khbd = arrangeKHBD(await revise({ sample, opts, khbd, issues: v.issues, g, signal, stage }), config);
   }
   return { part, khbd, score: s, validation: v, history };
 }

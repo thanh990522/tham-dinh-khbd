@@ -5,6 +5,7 @@ import {
 } from 'docx';
 import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from './schema.js';
 import { evidence, activityTags } from './active-learning.js';
+import { isEnglishLesson } from './arrange.js';
 
 const FONT = 'Times New Roman';
 const CONTENT_W = 9355; // A4, lề trái 3cm, phải 1.5cm (twip)
@@ -13,7 +14,7 @@ const LAND_W = 14400; // A4 ngang cho bảng 3 cột
 // ───────── helpers ─────────
 // Ảnh từ giáo án gốc: ký hiệu [HÌNH n] trong văn bản được thay bằng ảnh thật khi xuất.
 let IMAGES = new Map();
-const MAX_IMG_W = 160; // px
+const MAX_IMG_W = 110; // px
 const run = (text, o = {}) => new TextRun({ text: String(text ?? ''), font: FONT, size: o.size || 26, bold: o.bold, italics: o.italics, color: o.color, highlight: o.highlight });
 function imageRun(n) {
   const img = IMAGES.get(n);
@@ -190,50 +191,58 @@ const alLine = (a, size) => {
   return tags.length ? [para([run(' Active Learning: ', { bold: true, size, highlight: 'yellow' }), run(` ${tags.join(' · ')}`, { size, italics: true })])] : [];
 };
 
-function chiTietToChuc(a, size = 24) {
-  const t = a.to_chuc;
-  const out = [
-    label('B1 Giao nhiệm vụ: ', t.giao_nhiem_vu, { size }),
-    label('B2 Thực hiện: ', t.thuc_hien_nhiem_vu, { size }),
-    label('B3 Báo cáo, thảo luận: ', t.bao_cao_thao_luan, { size }),
-    label('B4 Kết luận: ', t.ket_luan_nhan_dinh, { size }),
-  ];
-  if (a.phan_vai.length) out.push(label('Phân vai: ', a.phan_vai.map((v) => `${v.vai}: ${v.nhiem_vu}`).join('; '), { size }));
-  if (a.kiem_tra_hieu_bai.co) out.push(label('Kiểm tra nhanh: ', `${a.kiem_tra_hieu_bai.cong_cu}${a.kiem_tra_hieu_bai.cach_dieu_chinh ? ` → ${a.kiem_tra_hieu_bai.cach_dieu_chinh}` : ''}`, { size }));
-  if (a.ho_tro_hs) out.push(label('Hỗ trợ: ', a.ho_tro_hs, { size }));
-  if (a.dung_ai) out.push(label('Dùng AI: ', a.dung_ai, { size }));
-  if (a.cau_hoi_chiem_nghiem.length) {
-    out.push(para([run('Câu hỏi chiêm nghiệm:', { bold: true, size })], { keepNext: true }));
-    a.cau_hoi_chiem_nghiem.forEach((q) => out.push(bullet(`${q.hoi}${q.cham_vao_ids.length ? ` (${q.cham_vao_ids.join(', ')})` : ''}`, { size })));
-  }
-  return out;
-}
-
 const lienKet = (a) => [...a.muc_tieu_ids, ...a.tlim_ids, ...a.gia_tri_ids, ...a.trao_quyen_ids].filter((x, i, arr) => arr.indexOf(x) === i).join(', ');
 
-function tienTrinh4PP(k) {
-  const rows = [headerRow(['CÁC HOẠT ĐỘNG', 'NỘI DUNG – SẢN PHẨM', 'MỤC TIÊU (+ Thời gian)'])];
-  for (const a of k.hoat_dong) {
-    rows.push([
-      [para([run(`${a.id}. ${a.ten}`, { bold: true, size: 24 })]), para([run(`${TEN_BUOC_4PP[a.buoc_4pp]} · ${HINH_THUC[a.hinh_thuc]}`, { italics: true, size: 22 })]), ...alLine(a, 22), ...chiTietToChuc(a)],
-      [label('Nội dung: ', a.noi_dung, { size: 24 }), label('Sản phẩm: ', a.san_pham, { size: 24 }), ...(a.rubric_ids.length ? [para([run(`Đánh giá theo ${a.rubric_ids.join(', ')}`, { italics: true, size: 22 })])] : [])],
-      [para([run(a.muc_tieu_hoat_dong, { size: 24 }), run(` (${lienKet(a)})`, { italics: true, size: 22 })]), para([run(`${a.thoi_gian_phut} phút`, { bold: true, size: 24 })])],
-    ]);
+// Nhãn bảng tiến trình theo ngôn ngữ giáo án (giống bảng Procedures của giáo án gốc)
+export const PROC_LABELS = {
+  en: {
+    head: ['Stage', 'Stage aim', 'Procedure', 'Interaction', 'Time'],
+    legend: 'Each activity: * Deliver the task  ** Implement the task  *** Discuss  **** Give comments or feedback',
+    content: 'Task: ', product: 'Answer key / product: ', roles: 'Roles: ', check: 'Quick check: ', support: 'Support: ', ai: 'AI: ', reflect: 'Reflection questions:', rubric: 'Assessed with ',
+    inter: { ca_nhan: 'Individual', cap_doi: 'Pair work', nhom: 'Group work', ca_lop: 'T-Ss' }, min: 'mins',
+  },
+  vi: {
+    head: ['Hoạt động', 'Mục tiêu', 'Tiến trình', 'Tương tác', 'Thời gian'],
+    legend: 'Mỗi hoạt động: * Giao nhiệm vụ  ** Thực hiện nhiệm vụ  *** Báo cáo, thảo luận  **** Kết luận, nhận định',
+    content: 'Nhiệm vụ: ', product: 'Sản phẩm: ', roles: 'Phân vai: ', check: 'Kiểm tra nhanh: ', support: 'Hỗ trợ: ', ai: 'Dùng AI: ', reflect: 'Câu hỏi chiêm nghiệm:', rubric: 'Đánh giá theo ',
+    inter: { ca_nhan: 'Cá nhân', cap_doi: 'Cặp đôi', nhom: 'Nhóm', ca_lop: 'GV-HS' }, min: 'phút',
+  },
+};
+
+function procedureCell(a, L) {
+  const sz = 22;
+  const t = a.to_chuc;
+  const out = [...alLine(a, sz), label(L.content, a.noi_dung, { size: sz })];
+  [['* ', t.giao_nhiem_vu], ['** ', t.thuc_hien_nhiem_vu], ['*** ', t.bao_cao_thao_luan], ['**** ', t.ket_luan_nhan_dinh]].forEach(([mk, txt]) => {
+    if (txt) out.push(para([run(mk, { bold: true, size: sz }), ...rich(txt, { size: sz })]));
+  });
+  out.push(label(L.product, a.san_pham, { size: sz }));
+  if (a.phan_vai.length) out.push(label(L.roles, a.phan_vai.map((v) => `${v.vai}: ${v.nhiem_vu}`).join('; '), { size: sz }));
+  if (a.kiem_tra_hieu_bai.co) out.push(label(L.check, `${a.kiem_tra_hieu_bai.cong_cu}${a.kiem_tra_hieu_bai.cach_dieu_chinh ? ` → ${a.kiem_tra_hieu_bai.cach_dieu_chinh}` : ''}`, { size: sz }));
+  if (a.ho_tro_hs) out.push(label(L.support, a.ho_tro_hs, { size: sz }));
+  if (a.dung_ai) out.push(label(L.ai, a.dung_ai, { size: sz }));
+  if (a.rubric_ids.length) out.push(para([run(`${L.rubric}${a.rubric_ids.join(', ')}`, { italics: true, size: 20 })]));
+  if (a.cau_hoi_chiem_nghiem.length) {
+    out.push(para([run(L.reflect, { bold: true, size: sz })], { keepNext: true }));
+    a.cau_hoi_chiem_nghiem.forEach((q) => out.push(bullet(`${q.hoi}${q.cham_vao_ids.length ? ` (${q.cham_vao_ids.join(', ')})` : ''}`, { size: sz })));
   }
-  return [h('III. TIẾN TRÌNH DẠY HỌC'), table(rows, [6400, 4600, 3400])];
+  return out;
 }
 
-function tienTrinhThuong(k) {
-  const out = [h('III. TIẾN TRÌNH DẠY HỌC')];
-  k.hoat_dong.forEach((a, i) => {
-    out.push(h(`Hoạt động ${i + 1}: ${a.ten} — ${TEN_LOAI_HOAT_DONG[a.loai]} (${a.thoi_gian_phut} phút)`, 2), ...alLine(a, 24));
-    out.push(label('a) Mục tiêu: ', `${a.muc_tieu_hoat_dong} (${lienKet(a)})`));
-    out.push(label('b) Nội dung: ', a.noi_dung));
-    out.push(label('c) Sản phẩm: ', a.san_pham + (a.rubric_ids.length ? ` — đánh giá theo rubric ${a.rubric_ids.join(', ')}` : '')));
-    out.push(para([run('d) Tổ chức thực hiện ', { bold: true }), run(`(${HINH_THUC[a.hinh_thuc]})`, { italics: true })]));
-    out.push(...chiTietToChuc(a, 26).map((p) => p));
-  });
-  return out;
+function tienTrinhBang(k) {
+  const L = PROC_LABELS[isEnglishLesson(k) ? 'en' : 'vi'];
+  const is4PP = k.meta.phuong_phap !== 'THUONG';
+  const rows = [headerRow(L.head)];
+  for (const a of k.hoat_dong) {
+    rows.push([
+      [para([run(`${a.id}. ${a.ten}`, { bold: true, size: 22 })]), para([run(is4PP ? TEN_BUOC_4PP[a.buoc_4pp] : TEN_LOAI_HOAT_DONG[a.loai], { italics: true, size: 20 })])],
+      [para([run(a.muc_tieu_hoat_dong, { size: 22 })]), para([run(`(${lienKet(a)})`, { italics: true, size: 20 })])],
+      procedureCell(a, L),
+      [para(L.inter[a.hinh_thuc] || '', { size: 22, align: AlignmentType.CENTER })],
+      [para([run(`${a.thoi_gian_phut} ${L.min}`, { bold: true, size: 22 })], { align: AlignmentType.CENTER })],
+    ]);
+  }
+  return [h(isEnglishLesson(k) ? 'III. TIẾN TRÌNH DẠY HỌC (PROCEDURES)' : 'III. TIẾN TRÌNH DẠY HỌC'), para([run(L.legend, { italics: true, size: 20 })]), table(rows, [2100, 2300, 7400, 1500, 1100], { size: 22 })];
 }
 
 function cuoiKHBD(k) {
@@ -253,14 +262,12 @@ function phuLucHinh(k, refs) {
 }
 
 export function khbdSections(k, config, refs) {
-  const is4PP = k.meta.phuong_phap !== 'THUONG';
-  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k), ...(is4PP ? [] : tienTrinhThuong(k)), ...(is4PP ? [] : [...cuoiKHBD(k), ...phuLucHinh(k, refs)])];
-  const sections = [{ properties: pagePortrait(), children: portrait }];
-  if (is4PP) {
-    sections.push({ properties: pageLandscape(), children: tienTrinh4PP(k) });
-    sections.push({ properties: pagePortrait(), children: [...cuoiKHBD(k), ...phuLucHinh(k, refs)] });
-  }
-  return sections;
+  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k)];
+  return [
+    { properties: pagePortrait(), children: portrait },
+    { properties: pageLandscape(), children: tienTrinhBang(k) },
+    { properties: pagePortrait(), children: [...cuoiKHBD(k), ...phuLucHinh(k, refs)] },
+  ];
 }
 
 const pagePortrait = () => ({ page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1701, right: 850 } } });
