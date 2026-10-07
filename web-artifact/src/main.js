@@ -181,6 +181,7 @@ function resultPanel(results, error) {
     </div>
     ${n === 1 ? breakdown(results[0]) : ''}
     <div class="go"><button class="btn primary" type="button" id="dl">Tải KHBD hoàn chỉnh (.docx)</button></div>
+    <p class="note dlmsg" hidden aria-live="polite"></p>
     ${kiemTra ? `<p class="note red">${kiemTra} chi tiết SGK cần thầy cô kiểm tra lại — đánh dấu đỏ ở phụ lục cuối file.</p>` : ''}
     ${conLai.length ? `<details class="left"><summary>${conLai.length} điểm chưa hoàn toàn đạt</summary><ul>${conLai.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
   el.querySelector('#dl').addEventListener('click', (ev) => save(ev.currentTarget));
@@ -199,20 +200,61 @@ function breakdown(r) {
   </dl>`;
 }
 
+// Tải file qua capability `downloads` của claude.ai: luôn báo rõ kết quả, không khoá nút.
+const SAVE_MSG = {
+  saved: ['ok', 'Đã gửi file tới trình duyệt — kiểm tra thư mục Tải xuống (Downloads).'],
+  delivered: ['ok', 'Đã chuyển file tới nơi thầy cô chọn.'],
+  declined: ['', 'Thầy cô đã bấm Huỷ ở hộp thoại lưu file. Bấm tải lại khi cần.'],
+  rate_limited: ['', 'Đang có một hộp thoại lưu file khác mở — đóng nó rồi bấm tải lại.'],
+  extension_not_enabled: ['red', 'Chế độ xem này của claude.ai đang tắt tải file .docx. Hãy mở trang trên claude.ai bằng trình duyệt máy tính (Chrome/Edge) rồi tải lại.'],
+  rejected_extension: ['red', 'claude.ai từ chối loại file .docx ở chế độ xem này. Hãy mở trang bằng trình duyệt máy tính rồi tải lại.'],
+  too_large: ['red', 'File quá lớn cho nơi lưu đã chọn. Hãy nâng cấp ít tiết hơn mỗi lần.'],
+  not_granted: ['red', 'Trang chưa được cấp quyền tải file.'],
+  unavailable: ['red', 'Chế độ xem này không hỗ trợ tải file. Hãy mở link trang trên claude.ai bằng trình duyệt máy tính (đã đăng nhập).'],
+};
+
 async function save(btn) {
   if (!S.blob) return;
-  if (!S.downloads) {
-    btn.disabled = true;
-    btn.textContent = 'Chế độ xem này không cho tải file';
-    return;
-  }
+  const out = btn.closest('.result').querySelector('.dlmsg');
+  const say = ([cls, text], code) => {
+    out.className = `note dlmsg ${cls}`;
+    out.textContent = code && !SAVE_MSG[code] ? `${text} (mã lỗi: ${code})` : text;
+    out.hidden = false;
+  };
+  if (!S.downloads) return say(SAVE_MSG.unavailable);
+  const filename = `KHBD_${(S.fileName || 'hoan_chinh').replace(/[\\/:*?"<>|]+/g, '_')}.docx`;
+  btn.disabled = true;
+  say(['', 'Đang mở hộp thoại lưu file của claude.ai — bấm Lưu/Save để tải về…']);
   try {
-    await S.downloads.save({ filename: `KHBD_${S.fileName || 'hoan_chinh'}.docx`, data: S.blob });
+    let res;
+    try {
+      res = await S.downloads.save({ filename, data: S.blob });
+    } catch (e) {
+      // Một số chế độ xem không nhận Blob: gửi lại một lần dạng mảng byte
+      if (e?.code !== 'bad_request' && e?.code !== 'transform_error') throw e;
+      res = await S.downloads.save({ filename, data: new Uint8Array(await S.blob.arrayBuffer()) });
+    }
+    say(SAVE_MSG[res?.status] || SAVE_MSG.saved);
   } catch (e) {
-    if (e?.code === 'declined' || e?.code === 'rate_limited') return;
-    btn.disabled = true;
-    btn.textContent = 'Không tải được ở chế độ xem này';
+    const code = e?.code || 'unavailable';
+    say(SAVE_MSG[code] || ['red', `Không tải được file: ${e?.message || 'lỗi không xác định'}`], code);
+    if (code === 'not_granted') offerPermissions(out);
+  } finally {
+    btn.disabled = false;
   }
+}
+
+async function offerPermissions(out) {
+  const perms = await (window.claude?.use ? window.claude.use('permissions') : null);
+  if (!perms) return;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'btn quiet';
+  b.textContent = 'Mở cài đặt quyền của trang';
+  b.addEventListener('click', () => perms.manage().catch(() => {
+    out.textContent = 'Hãy mở menu Permissions của trang (góc trên claude.ai) và bật quyền tải file, rồi bấm tải lại.';
+  }));
+  out.after(b);
 }
 
 // ───── khởi động ─────
