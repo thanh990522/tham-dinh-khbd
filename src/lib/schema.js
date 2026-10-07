@@ -105,11 +105,11 @@ export const KHBD_SCHEMA = obj(
     ),
     can_cu_chuong_trinh: obj(
       {
-        yeu_cau_can_dat: arr(str('Một yêu cầu cần đạt'), 'Yêu cầu cần đạt GDPT 2018 của bài/chủ đề'),
-        noi_dung_sgk_tom_tat: str('Tóm tắt nội dung/ngữ liệu SGK của bài (mục, bài tập, trang)'),
+        yeu_cau_can_dat: arr(str('Một yêu cầu cần đạt'), 'Yêu cầu cần đạt theo Chương trình GDPT 2018 của môn/lớp/chủ đề (không đối chiếu SGK, PPCT)'),
+        noi_dung_sgk_tom_tat: str('Để rỗng (không đối chiếu SGK)'),
         nguon_tham_khao: arr(str('URL hoặc tên tài liệu'), 'Nguồn đã tra cứu'),
         la_bai_mo_rong: bool('Bài/chủ đề mở rộng ngoài SGK (áp dụng Bước 3 nới lỏng)'),
-        ghi_chu_can_kiem_tra: arr(str('Chi tiết GV cần kiểm tra lại theo SGK'), 'Các điểm chưa xác minh được, KHÔNG bịa'),
+        ghi_chu_can_kiem_tra: arr(str('Không dùng'), 'Để mảng rỗng (không đối chiếu SGK, PPCT)'),
       },
       'Căn cứ chương trình'
     ),

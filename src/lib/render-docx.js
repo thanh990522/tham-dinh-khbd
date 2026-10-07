@@ -241,8 +241,7 @@ function cuoiKHBD(k) {
   if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), ...k.du_kien_kho_khan.map((x) => bullet(`${x.kho_khan} → ${x.giai_phap}`)));
   if (k.huong_dan_ve_nha) out.push(h('V. HƯỚNG DẪN TỰ HỌC Ở NHÀ'), ...lines(k.huong_dan_ve_nha));
   const cc = k.can_cu_chuong_trinh;
-  out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (GDPT 2018)'), ...cc.yeu_cau_can_dat.map((y) => bullet(y)));
-  if (cc.ghi_chu_can_kiem_tra.length) out.push(para([run('⚠ Giáo viên cần kiểm tra lại theo SGK:', { bold: true, color: 'C00000' })]), ...cc.ghi_chu_can_kiem_tra.map((n) => bullet([run(n, { color: 'C00000' })])));
+  out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (CHƯƠNG TRÌNH GDPT 2018)'), ...cc.yeu_cau_can_dat.map((y) => bullet(y)));
   return out;
 }
 

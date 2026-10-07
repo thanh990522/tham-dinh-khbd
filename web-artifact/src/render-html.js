@@ -146,8 +146,7 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
     if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), k.du_kien_kho_khan.map((x) => li(`${t(x.kho_khan)} → ${t(x.giai_phap)}`)).join(''));
     if (k.huong_dan_ve_nha) out.push(h('V. HƯỚNG DẪN TỰ HỌC Ở NHÀ'), p(t(k.huong_dan_ve_nha)));
     const cc = k.can_cu_chuong_trinh;
-    out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (GDPT 2018)'), cc.yeu_cau_can_dat.map((y) => li(t(y))).join(''));
-    if (cc.ghi_chu_can_kiem_tra.length) out.push(p('<b style="color:#c00000">⚠ Giáo viên cần kiểm tra lại theo SGK:</b>'), cc.ghi_chu_can_kiem_tra.map((n) => li(`<span style="color:#c00000">${t(n)}</span>`)).join(''));
+    out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (CHƯƠNG TRÌNH GDPT 2018)'), cc.yeu_cau_can_dat.map((y) => li(t(y))).join(''));
     const used = new Set([...JSON.stringify(k).matchAll(/\[HÌNH (\d+)\]/g)].map((x) => Number(x[1])));
     const left = (refs[idx] || []).filter((n) => !used.has(n) && IMG.has(n));
     if (left.length) out.push(h('PHỤ LỤC – HÌNH ẢNH TỪ GIÁO ÁN GỐC'), left.map((n) => p(`<b>Hình ${n}:</b> ${imgTag(n)}`)).join(''));

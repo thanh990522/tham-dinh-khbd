@@ -169,7 +169,6 @@ function resultPanel(results, error) {
   const n = results.length;
   const avg = Math.round(results.reduce((s, r) => s + r.score.diem_100, 0) / n);
   const allPass = results.every((r) => !r.score.co_p1 && r.score.diem_100 >= 85);
-  const kiemTra = results.reduce((s, r) => s + r.khbd.can_cu_chuong_trinh.ghi_chu_can_kiem_tra.length, 0);
   const conLai = results.flatMap((r) => [
     ...r.validation.issues.filter((x) => x.muc_do !== 'P3').map((x) => `${n > 1 ? `${r.khbd.meta.ten_bai || r.part.tieu_de}: ` : ''}${x.van_de}`),
   ]);
@@ -185,7 +184,6 @@ function resultPanel(results, error) {
     <p class="note dlmsg" hidden aria-live="polite"></p>
     <p class="note">Nếu nút tải không hoạt động: bấm <b>Sao chép để dán vào Word</b>, mở Word, nhấn <b>Ctrl+V</b> rồi lưu lại.</p>
     <details class="preview" open><summary>Xem trước KHBD hoàn chỉnh</summary><div class="doc" tabindex="0"></div></details>
-    ${kiemTra ? `<p class="note red">${kiemTra} chi tiết SGK cần thầy cô kiểm tra lại — đánh dấu đỏ ở phụ lục cuối file.</p>` : ''}
     ${conLai.length ? `<details class="left"><summary>${conLai.length} điểm chưa hoàn toàn đạt</summary><ul>${conLai.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
   el.querySelector('#dl').addEventListener('click', (ev) => save(ev.currentTarget));
   el.querySelector('.doc').innerHTML = S.html;

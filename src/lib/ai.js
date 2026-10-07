@@ -111,14 +111,14 @@ function originalBlocks(input) {
   return [{ type: 'text', text: `<ban_goc_cua_giao_vien>\n${input.text}\n</ban_goc_cua_giao_vien>` }];
 }
 
-// 1) Tra cứu yêu cầu cần đạt + nội dung SGK bằng web search (server tool).
+// 1) Tra cứu yêu cầu cần đạt theo Chương trình GDPT 2018 bằng web search (server tool).
 export async function research({ config, opts, input, onText }) {
-  const system = 'Bạn là trợ lý tra cứu chương trình GDPT 2018 và SGK Việt Nam. Chỉ báo cáo điều tìm thấy trong nguồn; ghi rõ điều chưa xác minh được. Không bịa.';
+  const system = 'Bạn là trợ lý tra cứu Chương trình giáo dục phổ thông 2018 của Việt Nam. Chỉ báo cáo điều tìm thấy trong nguồn; ghi rõ điều chưa xác minh được. Không bịa.';
   const hint = input?.kind === 'text' ? input.text.slice(0, 2500) : '';
   const content = [
     {
       type: 'text',
-      text: `Tra cứu cho KHBD sau:\n${buildMetaBlock(opts)}\n\nĐoạn đầu bản gốc (để nhận diện bài):\n${hint}\n\nHãy tìm và đối chiếu ≥2 nguồn (ưu tiên trang chính thống, loigiaihay, vietjack, tech12h, kenhgiaovien, hoc10, sachmem):\n1. Yêu cầu cần đạt của bài/chủ đề theo CT GDPT 2018 (và theo SGK/PPCT nếu có).\n2. Nội dung SGK của đúng bài: các mục/bài tập, số trang, ngữ liệu chính, đáp án các bài tập nếu có.\n3. Điểm nào trong bản gốc của GV khác với SGK (nếu phát hiện).\nTrình bày ngắn gọn bằng tiếng Việt, mỗi ý ghi nguồn URL. Mục nào không tìm được thì ghi "CHƯA XÁC MINH".`,
+      text: `Tra cứu cho KHBD sau:\n${buildMetaBlock(opts)}\n\nĐoạn đầu bản gốc (để nhận diện bài):\n${hint}\n\nHãy tìm yêu cầu cần đạt của môn/lớp/chủ đề này trong Chương trình GDPT 2018 (Thông tư 32/2018/TT-BGDĐT và văn bản sửa đổi), ưu tiên văn bản gốc của Bộ GD&ĐT. KHÔNG cần tra SGK hay PPCT của trường.\nTrình bày ngắn gọn bằng tiếng Việt, mỗi ý ghi nguồn URL. Mục nào không tìm được thì ghi "CHƯA XÁC MINH".`,
     },
   ];
   const msg = await callClaude({
@@ -154,7 +154,7 @@ export async function generateKHBD({ config, opts, input, researchResult, mode, 
     { type: 'text', text: `${nhiemVu}\n\n<thong_tin_bai_hoc>\n${buildMetaBlock(opts)}\n</thong_tin_bai_hoc>` },
     ...(researchResult
       ? [{ type: 'text', text: `<ket_qua_tra_cuu>\n${researchResult.tom_tat}\nNguồn: ${researchResult.nguon.join(' ; ')}\n</ket_qua_tra_cuu>` }]
-      : [{ type: 'text', text: '<ket_qua_tra_cuu>Không tra cứu web. Dựa vào bản gốc; mọi chi tiết SGK chưa chắc ghi vào ghi_chu_can_kiem_tra.</ket_qua_tra_cuu>' }]),
+      : [{ type: 'text', text: '<ket_qua_tra_cuu>Không tra cứu web. Yêu cầu cần đạt viết theo Chương trình GDPT 2018 của môn/lớp; ngữ liệu lấy từ bản gốc.</ket_qua_tra_cuu>' }]),
     ...originalBlocks(input),
   ];
   return structuredCall({ config, system, content, schema: KHBD_SCHEMA, effort: mode === 'trich_xuat' ? 'medium' : config.effort_soan, onText });

@@ -38,7 +38,8 @@ ${Object.entries(PHUONG_PHAP).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
 </danh_sach_phuong_phap>
 
 NGUYÊN TẮC KHI SOẠN / NÂNG CẤP
-1. Trung thực về nội dung: không bịa số liệu, ngữ liệu, số trang, đáp án SGK. Chỉ dùng ngữ liệu có trong bản gốc của giáo viên hoặc trong kết quả tra cứu được cung cấp. Chi tiết chưa chắc chắn → ghi vào can_cu_chuong_trinh.ghi_chu_can_kiem_tra ("GV kiểm tra lại theo SGK"), không tự điền.
+1. Trung thực về nội dung: không bịa số liệu, ngữ liệu, số trang, đáp án. Chỉ dùng ngữ liệu có trong bản gốc của giáo viên; chi tiết không chắc chắn thì không đưa vào.
+1b. Yêu cầu cần đạt (can_cu_chuong_trinh.yeu_cau_can_dat): viết theo Chương trình GDPT 2018 của đúng môn, lớp, chủ đề (Thông tư 32/2018/TT-BGDĐT và các văn bản sửa đổi). KHÔNG đối chiếu SGK, KHÔNG đối chiếu PPCT của trường (quy định này thay cho mục A1 "bắt buộc tra cứu nội dung bài/SGK" trong kiến thức nền). Để rỗng noi_dung_sgk_tom_tat và ghi_chu_can_kiem_tra.
 2. Khi nâng cấp bản gốc: GIỮ ý đồ sư phạm, ngữ liệu, bài tập, đáp án, tên GV của giáo viên; tái cấu trúc và bổ sung để đạt chuẩn. Ghi từng thay đổi quan trọng + lý do (dẫn tiêu chí) vào ghi_chu_thay_doi.
 3. Mô tả HOẠT ĐỘNG của GV và HS, không chép lời thoại dài; HS làm trung tâm; dùng động từ hành động của HS.
 4. Ngôn ngữ: các trường nội dung viết bằng ngôn ngữ ghi ở meta.ngon_ngu_noi_dung (môn ngoại ngữ có thể giữ ngữ liệu, câu hỏi, đáp án bằng tiếng nước ngoài; phần mục tiêu, tổ chức thực hiện vẫn rõ ràng).
@@ -57,7 +58,7 @@ VĂN PHONG NGẮN GỌN (bắt buộc — KHBD dùng để dạy, không phải 
   • Bộ câu hỏi định hướng: ≤ 4 nhóm, mỗi nhóm ≤ 3 câu; gợi ý đáp án ≤ 12 từ. mo_ta để rỗng.
   • Câu hỏi chiêm nghiệm: 2–3 câu, mỗi câu ≤ 20 từ.
   • du_kien_kho_khan ≤ 3 dòng, mỗi vế ≤ 12 từ; huong_dan_ve_nha ≤ 2 câu.
-  • can_cu_chuong_trinh: yeu_cau_can_dat ≤ 3 ý, mỗi ý ≤ 20 từ; noi_dung_sgk_tom_tat ≤ 40 từ; ghi_chu_can_kiem_tra ≤ 3 ý ngắn; ly_do_chon_phuong_phap ≤ 25 từ; ghi_chu_thay_doi ≤ 5 ý, mỗi ý ≤ 15 từ.
+  • can_cu_chuong_trinh: yeu_cau_can_dat ≤ 3 ý, mỗi ý ≤ 20 từ; noi_dung_sgk_tom_tat và ghi_chu_can_kiem_tra để rỗng; ly_do_chon_phuong_phap ≤ 25 từ; ghi_chu_thay_doi ≤ 5 ý, mỗi ý ≤ 15 từ.
 - Ngắn KHÔNG có nghĩa là thiếu: mọi trường bắt buộc trong danh mục dưới đây vẫn phải có nội dung cụ thể, chấm được.
 
 DANH MỤC BẮT BUỘC ĐỂ ĐẠT (bộ kiểm tra tự động sẽ soát từng mục — thiếu mục nào sẽ bị trả lại):

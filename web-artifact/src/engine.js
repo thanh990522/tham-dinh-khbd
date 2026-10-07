@@ -89,7 +89,7 @@ const SCHEMA_A = (() => {
 const SCHEMA_B = pick(KEYS_B);
 
 const TASK = 'NHIỆM VỤ: NÂNG CẤP bản KHBD gốc của giáo viên thành KHBD hoàn chỉnh đạt TOÀN BỘ danh mục bắt buộc (≥ 88/100, không lỗi P1/P2). Giữ ngữ liệu, bài tập, đáp án, ý đồ và ký hiệu [HÌNH n] của giáo viên.';
-const NO_WEB = 'Không tra cứu được Internet: dựa vào bản gốc và hiểu biết chắc chắn của bạn; chi tiết SGK/yêu cầu cần đạt chưa chắc chắn PHẢI ghi vào can_cu_chuong_trinh.ghi_chu_can_kiem_tra ("GV kiểm tra lại theo SGK"), không bịa số trang, đáp án, ngữ liệu.';
+const NO_WEB = 'Yêu cầu cần đạt lấy theo Chương trình GDPT 2018 của môn/lớp (không đối chiếu SGK hay PPCT của trường). Ngữ liệu, bài tập, đáp án lấy từ bản gốc của giáo viên, không bịa thêm.';
 
 function withOriginal(prompt, original) {
   const p = prompt.replace('{{BAN_GOC}}', () => original);
@@ -140,7 +140,7 @@ async function grade({ sample, khbd, validation, signal, stage }) {
   const tc = is4PP
     ? 'Bước 6 (tiết 4PP): chấm TC1 (toi_da 10), TC3 (10), TC4 (12), TLIM (4), TQ (4). TC2 là CHỜ DỰ GIỜ — không đưa vào.'
     : 'Bước 6 (tiết thường, CV5555): chấm 1.1, 1.2, 1.3, 1.4, 2.1, 2.3 — toi_da 10, diem chỉ 10/7/4. Tiêu chí chờ dự giờ không đưa vào.';
-  const p = `${SYSTEM}\n\nNHIỆM VỤ: với vai trò chuyên viên thẩm định, chấm KHBD dưới đây theo rubric chính thức.\n- Bước 2/3 (tối đa 10): đối chiếu yêu cầu cần đạt (${is4PP ? 'tiết 4PP → nới lỏng' : 'tiết thường → chặt'}); không tra cứu được web nên chấm theo YCCĐ phổ biến của chủ đề.\n- ${tc}\n- Liệt kê lỗi chuyên môn mà bộ kiểm tra quy tắc không thấy: sai kiến thức, đáp án sai, nhiệm vụ không khả thi trong thời lượng, sản phẩm lệch mục tiêu.\n- Chỉ chấm điều nhìn thấy trên bản thiết kế; mỗi điểm trừ nêu căn cứ và cách lấy lại điểm.\n\n<ket_qua_bo_kiem_tra_quy_tac>\n${JSON.stringify({ diem: validation.diem, so_loi: validation.issues.length })}\n</ket_qua_bo_kiem_tra_quy_tac>\n\n<khbd>\n${JSON.stringify(khbd)}\n</khbd>\n\nTrả về DUY NHẤT một đối tượng JSON đúng JSON Schema sau:\n${JSON.stringify(GRADE_SCHEMA)}`;
+  const p = `${SYSTEM}\n\nNHIỆM VỤ: với vai trò chuyên viên thẩm định, chấm KHBD dưới đây theo rubric chính thức.\n- Bước 2/3 (tối đa 10): đối chiếu yêu cầu cần đạt (${is4PP ? 'tiết 4PP → nới lỏng' : 'tiết thường → chặt'}); đối chiếu yêu cầu cần đạt của Chương trình GDPT 2018 cho môn/lớp/chủ đề, không xét SGK hay PPCT của trường.\n- ${tc}\n- Liệt kê lỗi chuyên môn mà bộ kiểm tra quy tắc không thấy: sai kiến thức, đáp án sai, nhiệm vụ không khả thi trong thời lượng, sản phẩm lệch mục tiêu.\n- Chỉ chấm điều nhìn thấy trên bản thiết kế; mỗi điểm trừ nêu căn cứ và cách lấy lại điểm.\n\n<ket_qua_bo_kiem_tra_quy_tac>\n${JSON.stringify({ diem: validation.diem, so_loi: validation.issues.length })}\n</ket_qua_bo_kiem_tra_quy_tac>\n\n<khbd>\n${JSON.stringify(khbd)}\n</khbd>\n\nTrả về DUY NHẤT một đối tượng JSON đúng JSON Schema sau:\n${JSON.stringify(GRADE_SCHEMA)}`;
   stage('cham');
   return fillBySchema(await ask(sample, p, { tier: 'default', signal, onChars: (n) => stage('cham', n) }), GRADE_SCHEMA);
 }
