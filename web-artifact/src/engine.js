@@ -9,6 +9,7 @@ import { validateKHBD, tongHopDiem } from '../../src/lib/validator.js';
 import { buildSystemPrompt, buildMetaBlock } from '../../src/lib/prompts.js';
 import { htmlToText, splitLessons, preAudit, imageRefs } from '../../src/lib/parse-input.js';
 import { buildKHBDDocument } from '../../src/lib/render-docx.js';
+import { renderKHBDHtml } from './render-html.js';
 import kienThuc from '../../src/knowledge/kien-thuc-nen.md';
 import quyTrinh from '../../src/knowledge/quy-trinh-tham-dinh.md';
 import activeLearning from '../../src/knowledge/tieu-chi-active-learning.md';
@@ -184,4 +185,8 @@ export async function upgradeLesson({ sample, opts, part, signal, stage }) {
 export async function buildDocx(results, images) {
   const doc = buildKHBDDocument(results.map((r) => r.khbd), config, { images, refs: results.map((r) => imageRefs(r.part.text)) });
   return Packer.toBlob(doc);
+}
+
+export function buildHtml(results, images) {
+  return renderKHBDHtml(results.map((r) => r.khbd), config, { images, refs: results.map((r) => imageRefs(r.part.text)) });
 }

@@ -1,8 +1,8 @@
-import { readFile, preAudit, upgradeLesson, buildDocx, errMsg } from './engine.js';
+import { readFile, preAudit, upgradeLesson, buildDocx, buildHtml, errMsg } from './engine.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const S = { parts: [], images: [], fileName: '', sample: null, downloads: null, busy: false, ctl: null, blob: null };
+const S = { parts: [], images: [], fileName: '', sample: null, downloads: null, busy: false, ctl: null, blob: null, html: '' };
 
 // Các giai đoạn của một tiết: [khoá, nhãn, % bắt đầu, % kết thúc, số ký tự dự kiến]
 const STAGES = [
@@ -150,6 +150,7 @@ async function run() {
   stop.remove();
   if (results.length) {
     S.blob = await buildDocx(results, S.images);
+    S.html = buildHtml(results, S.images);
     box.appendChild(resultPanel(results, error));
   } else {
     const p = document.createElement('p');
@@ -180,11 +181,15 @@ function resultPanel(results, error) {
         <span>${n} tiết · ${results.map((r) => `${r.score.xep_loai}`).join(', ')}${error ? ' · các tiết sau bị dừng giữa chừng' : ''}</span></div>
     </div>
     ${n === 1 ? breakdown(results[0]) : ''}
-    <div class="go"><button class="btn primary" type="button" id="dl">Tải KHBD hoàn chỉnh (.docx)</button></div>
+    <div class="go"><button class="btn primary" type="button" id="dl">Tải KHBD hoàn chỉnh (.docx)</button><button class="btn quiet" type="button" id="cp">Sao chép để dán vào Word</button></div>
     <p class="note dlmsg" hidden aria-live="polite"></p>
+    <p class="note">Nếu nút tải không hoạt động: bấm <b>Sao chép để dán vào Word</b>, mở Word, nhấn <b>Ctrl+V</b> rồi lưu lại.</p>
+    <details class="preview" open><summary>Xem trước KHBD hoàn chỉnh</summary><div class="doc" tabindex="0"></div></details>
     ${kiemTra ? `<p class="note red">${kiemTra} chi tiết SGK cần thầy cô kiểm tra lại — đánh dấu đỏ ở phụ lục cuối file.</p>` : ''}
     ${conLai.length ? `<details class="left"><summary>${conLai.length} điểm chưa hoàn toàn đạt</summary><ul>${conLai.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
   el.querySelector('#dl').addEventListener('click', (ev) => save(ev.currentTarget));
+  el.querySelector('.doc').innerHTML = S.html;
+  el.querySelector('#cp').addEventListener('click', (ev) => copyDoc(ev.currentTarget));
   return el;
 }
 
@@ -242,6 +247,33 @@ async function save(btn) {
   } finally {
     btn.disabled = false;
   }
+}
+
+// Sao chép bản KHBD (định dạng, bảng, hình) để dán vào Word — không phụ thuộc chức năng tải file.
+async function copyDoc(btn) {
+  const panel = btn.closest('.result');
+  const out = panel.querySelector('.dlmsg');
+  const doc = panel.querySelector('.doc');
+  const say = (cls, text) => { out.className = `note dlmsg ${cls}`; out.textContent = text; out.hidden = false; };
+  const ok = () => say('ok', 'Đã sao chép toàn bộ KHBD. Mở Word (file mới) → nhấn Ctrl+V → lưu lại.');
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([S.html], { type: 'text/html' }),
+      'text/plain': new Blob([doc.innerText], { type: 'text/plain' }),
+    })]);
+    return ok();
+  } catch { /* thử cách chọn vùng */ }
+  panel.querySelector('.preview').open = true;
+  const range = document.createRange();
+  range.selectNodeContents(doc);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  let done = false;
+  try { done = document.execCommand('copy'); } catch { done = false; }
+  if (done) { sel.removeAllRanges(); return ok(); }
+  say('red', 'Trình duyệt chặn sao chép tự động. Bản xem trước bên dưới đã được bôi đen — nhấn Ctrl+C (Mac: ⌘+C), rồi dán vào Word.');
+  doc.focus();
 }
 
 async function offerPermissions(out) {

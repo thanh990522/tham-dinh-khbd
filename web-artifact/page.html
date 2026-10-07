@@ -6,6 +6,7 @@
 /* Bố cục: dải đầu trang màu xám than của Trường Việt Anh với sọc vàng "school bus", thẻ thao tác trắng nổi lên trên.
    Màu thương hiệu (truongvietanh.com): vàng #FCDB05 · trắng #FFFFFF · xám than #24292D. */
 :root {
+  --doc-bg: #ffffff; --doc-ink: #000000; --doc-rule: #d6d6d0;
   --brand: #FCDB05; --brand-deep: #e9c900; --brand-ink: #24292D; --band: #24292D; --band-ink: #ffffff;
   --paper: #f4f4f1; --sheet: #ffffff; --ink: #24292D; --muted: #5d646a; --rule: #e3e2dc;
   --accent: #24292D; --accent-soft: #fff8cc;
@@ -127,6 +128,12 @@ input[type="checkbox"] { accent-color: var(--brand-ink); }
 details.left summary { cursor: pointer; font-size: 13px; color: var(--muted); }
 details.left ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 4px; }
 
+details.preview { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
+details.preview > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; font-size: 14px; }
+/* Bản xem trước luôn là "tờ giấy trắng" ở cả hai giao diện vì nó mô phỏng file Word */
+.doc { background: var(--doc-bg); color: var(--doc-ink); margin: 0 10px 10px; padding: 18px 20px; border: 1px solid var(--doc-rule); border-radius: 6px; max-height: 560px; overflow: auto; }
+.doc img { max-width: 100%; height: auto; }
+.doc table { max-width: 100%; }
 footer { font-size: 12px; color: var(--muted); text-align: center; text-wrap: balance; }
 @media (max-width: 560px) {
   .step { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; }
