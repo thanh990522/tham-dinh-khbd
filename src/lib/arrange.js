@@ -3,6 +3,10 @@
 //  • cân thời lượng để tổng đúng 45 × số tiết (Chiêm nghiệm/Củng cố ≥ 3 phút)
 //  • giới hạn thời gian GV giảng ≤ 10 phút/lượt và ≤ thời lượng hoạt động
 //  • bỏ mục rỗng, mục trùng, tham chiếu hỏng
+import { isEnglishLesson, detectLessonType, defaultStage, GOI_Y_LOAI_TIET } from './english.js';
+
+export { isEnglishLesson };
+
 const THU_TU_LOAI = ['khoi_dong', 'xac_dinh_nhiem_vu', 'hinh_thanh_kien_thuc', 'luyen_tap', 'van_dung', 'chiem_nghiem', 'cung_co'];
 const THU_TU_BUOC = ['lam_ro_ky_vong', 'thuc_hanh', 'khac', 'bao_cao_danh_gia', 'chiem_nghiem', 'cung_co'];
 const CUOI = ['chiem_nghiem', 'cung_co'];
@@ -17,8 +21,11 @@ const clean = (arr, key) => {
   });
 };
 
-export function arrangeKHBD(input, config = {}) {
+// opts: thông tin GV nhập trên trang (tuần, tiết PPCT…) — luôn ưu tiên hơn giá trị AI điền
+export function arrangeKHBD(input, config = {}, opts = {}) {
   const k = structuredClone(input);
+  if (opts.tuan) k.meta.tuan = String(opts.tuan);
+  if (opts.tiet_ppct) k.meta.tiet_ppct = String(opts.tiet_ppct);
   const is4PP = k.meta.phuong_phap !== 'THUONG';
   const phutTiet = (config.phut_moi_tiet || 45) * (k.meta.so_tiet || 1);
 
@@ -61,6 +68,17 @@ export function arrangeKHBD(input, config = {}) {
     for (const f of Object.keys(a.to_chuc)) a.to_chuc[f] = sub(a.to_chuc[f]).trim();
   });
 
+  // 3b. Tiếng Anh: loại tiết, khung, stage của từng hoạt động; dọn bảng phân tích ngôn ngữ
+  if (k.tieng_anh && isEnglishLesson(k)) {
+    const ta = k.tieng_anh;
+    if (!ta.loai_tiet) ta.loai_tiet = detectLessonType(`${k.meta.ten_bai} ${opts.loai_tiet || ''}`);
+    if (opts.loai_tiet) ta.loai_tiet = opts.loai_tiet;
+    if (!ta.khung) ta.khung = GOI_Y_LOAI_TIET[ta.loai_tiet]?.khung || 'PPP';
+    ta.phan_tich_ngon_ngu = clean(ta.phan_tich_ngon_ngu, 'form');
+    ta.board_plan = ta.board_plan.map((x) => String(x).trim()).filter(Boolean);
+    k.hoat_dong.forEach((a) => { if (!a.giai_doan_ta) a.giai_doan_ta = defaultStage(a, ta.khung); });
+  }
+
   // 4. Thời lượng
   k.hoat_dong.forEach((a) => {
     a.thoi_gian_phut = Math.max(1, Math.round(a.thoi_gian_phut || 0));
@@ -80,9 +98,4 @@ export function arrangeKHBD(input, config = {}) {
     a.phut_gv_thuyet_giang = Math.max(0, Math.min(10, a.thoi_gian_phut, Math.round(a.phut_gv_thuyet_giang || 0)));
   });
   return k;
-}
-
-// Ngôn ngữ trình bày bảng tiến trình: tiếng Anh cho môn Tiếng Anh/giáo án tiếng Anh, còn lại tiếng Việt
-export function isEnglishLesson(k) {
-  return /english|tiếng anh/i.test(`${k.meta.mon_hoc} ${k.meta.ngon_ngu_noi_dung}`);
 }

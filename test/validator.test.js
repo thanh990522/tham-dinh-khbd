@@ -189,3 +189,41 @@ test('tự sắp xếp: đúng trình tự, đánh số lại, cân 45 phút, gi
   assert.notDeepEqual(before, r.hoat_dong.map((a) => a.id));
   assert.deepEqual(validateKHBD(r, { config }).issues, []);
 });
+
+test('Tiếng Anh: nhận loại tiết, Week/Period, tự gán stage, ưu tiên Week/Period GV nhập', async () => {
+  const { arrangeKHBD } = await import('../src/lib/arrange.js');
+  const { detectLessonType, detectWeekPeriod, isEnglishLesson } = await import('../src/lib/english.js');
+  assert.equal(detectLessonType('Unit 2 – Lesson 2: A closer look 1'), 'A Closer Look 1');
+  assert.equal(detectLessonType('LESSON 6: SKILLS 2'), 'Skills 2');
+  assert.equal(detectLessonType('Lesson 7 – Looking back and Project'), 'Looking Back & Project');
+  assert.deepEqual(detectWeekPeriod('Week: 3\nPeriod 12\nwe go out at the weekend'), { week: '3', period: '12' });
+  assert.deepEqual(detectWeekPeriod('Tuần 5 – Tiết PPCT: 18'), { week: '5', period: '18' });
+  assert.deepEqual(detectWeekPeriod('every weekend, a period of time'), { week: '', period: '' });
+
+  const k = sample();
+  assert.ok(isEnglishLesson(k));
+  k.tieng_anh.loai_tiet = '';
+  k.tieng_anh.khung = '';
+  k.hoat_dong.forEach((a) => { a.giai_doan_ta = ''; });
+  const r = arrangeKHBD(k, config, { tuan: '3', tiet_ppct: '12' });
+  assert.equal(r.tieng_anh.loai_tiet, 'Getting Started');
+  assert.equal(r.tieng_anh.khung, 'PPP');
+  assert.deepEqual([r.meta.tuan, r.meta.tiet_ppct], ['3', '12']);
+  assert.equal(r.hoat_dong[0].giai_doan_ta, 'WARM-UP');
+  assert.deepEqual(r.hoat_dong.slice(-2).map((a) => a.giai_doan_ta), ['REFLECTION', 'CONSOLIDATION']);
+  assert.deepEqual(validateKHBD(r, { config }).issues, []);
+});
+
+test('Tiếng Anh: góp ý P3 khi thiếu stage / Language analysis / Board plan; môn khác không bị soát', () => {
+  const k = sample();
+  k.hoat_dong[0].giai_doan_ta = '';
+  k.tieng_anh.phan_tich_ngon_ngu = [];
+  k.tieng_anh.board_plan = [];
+  assert.deepEqual(codes(validateKHBD(k, { config })), ['P3:TA-STAGE', 'P3:TA-LA', 'P3:TA-BP']);
+  const t = sample();
+  t.meta.mon_hoc = 'Toán';
+  t.meta.ngon_ngu_noi_dung = 'Tiếng Việt';
+  t.tieng_anh = fillBySchema({}, KHBD_SCHEMA.properties.tieng_anh);
+  t.hoat_dong.forEach((a) => { a.giai_doan_ta = ''; });
+  assert.ok(!codes(validateKHBD(t, { config })).some((c) => c.includes('TA-')));
+});

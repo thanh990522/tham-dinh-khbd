@@ -337,6 +337,7 @@
       "ten": "Warm-up: HEALTH word race",
       "loai": "khoi_dong",
       "buoc_4pp": "lam_ro_ky_vong",
+      "giai_doan_ta": "WARM-UP",
       "thoi_gian_phut": 4,
       "phut_gv_thuyet_giang": 2,
       "muc_tieu_ids": [
@@ -385,6 +386,7 @@
       "ten": "Vocabulary + Listen and read (Bài 1)",
       "loai": "hinh_thanh_kien_thuc",
       "buoc_4pp": "thuc_hanh",
+      "giai_doan_ta": "PRESENTATION",
       "thoi_gian_phut": 8,
       "phut_gv_thuyet_giang": 3,
       "muc_tieu_ids": [
@@ -432,6 +434,7 @@
       "ten": "Practice: Bài 2 & Bài 3",
       "loai": "luyen_tap",
       "buoc_4pp": "thuc_hanh",
+      "giai_doan_ta": "PRACTICE",
       "thoi_gian_phut": 7,
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
@@ -479,6 +482,7 @@
       "ten": "Practice: Bài 4",
       "loai": "luyen_tap",
       "buoc_4pp": "thuc_hanh",
+      "giai_doan_ta": "PRACTICE",
       "thoi_gian_phut": 4,
       "phut_gv_thuyet_giang": 0,
       "muc_tieu_ids": [
@@ -517,6 +521,7 @@
       "ten": "Production: Our healthy living plan (Bài 5)",
       "loai": "van_dung",
       "buoc_4pp": "thuc_hanh",
+      "giai_doan_ta": "PRODUCTION",
       "thoi_gian_phut": 11,
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
@@ -586,6 +591,7 @@
       "ten": "Report & Compare: Same / Different",
       "loai": "van_dung",
       "buoc_4pp": "bao_cao_danh_gia",
+      "giai_doan_ta": "PRODUCTION",
       "thoi_gian_phut": 5,
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
@@ -641,6 +647,7 @@
       "ten": "Chiêm nghiệm",
       "loai": "chiem_nghiem",
       "buoc_4pp": "chiem_nghiem",
+      "giai_doan_ta": "REFLECTION",
       "thoi_gian_phut": 3,
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
@@ -698,6 +705,7 @@
       "ten": "Củng cố & về nhà",
       "loai": "cung_co",
       "buoc_4pp": "cung_co",
+      "giai_doan_ta": "CONSOLIDATION",
       "thoi_gian_phut": 3,
       "phut_gv_thuyet_giang": 1,
       "muc_tieu_ids": [
@@ -730,6 +738,70 @@
       "cau_hoi_chiem_nghiem": []
     }
   ],
+  "tieng_anh": {
+    "loai_tiet": "Getting Started",
+    "khung": "PPP",
+    "trong_tam": "Vocabulary: healthy activities; talking about good/bad habits for health",
+    "phan_tich_ngon_ngu": [
+      {
+        "form": "popular (a)",
+        "pronunciation": "/ˈpɒpjələr/",
+        "meaning": "liked, enjoyed, or supported by many people",
+        "vietnamese": "phổ biến"
+      },
+      {
+        "form": "fresh (a)",
+        "pronunciation": "/freʃ/",
+        "meaning": "new or different",
+        "vietnamese": "tươi, mới"
+      },
+      {
+        "form": "join (v)",
+        "pronunciation": "/dʒɔɪn/",
+        "meaning": "to do an activity together with others",
+        "vietnamese": "tham gia"
+      },
+      {
+        "form": "sunburn (n)",
+        "pronunciation": "/ˈsʌnbɜːn/",
+        "meaning": "red, painful skin from too much sun",
+        "vietnamese": "cháy nắng"
+      },
+      {
+        "form": "suncream (n)",
+        "pronunciation": "/ˈsʌnkriːm/",
+        "meaning": "cream that protects skin from the sun",
+        "vietnamese": "kem chống nắng"
+      },
+      {
+        "form": "lunch box (n)",
+        "pronunciation": "/ˈlʌntʃ bɒks/",
+        "meaning": "a box for carrying lunch",
+        "vietnamese": "hộp cơm trưa"
+      },
+      {
+        "form": "boating (n)",
+        "pronunciation": "/ˈbəʊtɪŋ/",
+        "meaning": "going out in a small boat",
+        "vietnamese": "chèo thuyền"
+      },
+      {
+        "form": "cycling (n)",
+        "pronunciation": "/ˈsaɪklɪŋ/",
+        "meaning": "riding a bicycle",
+        "vietnamese": "đạp xe"
+      }
+    ],
+    "board_plan": [
+      "Date of teaching: ……",
+      "Unit 2: Healthy living – Lesson 1: Getting started – Let's go out!",
+      "Warm-up: Brainstorming – HEALTH",
+      "I. Vocabulary: popular (a) phổ biến; fresh (a) tươi, mới; join (v) tham gia",
+      "II. Practice: Ex 2 – Tick; Ex 3 – Words under pictures; Ex 4 – Complete (p. 19)",
+      "III. Production: Ex 5 – Survey: Good or bad for health",
+      "Homework: learn new words; prepare A Closer Look 1"
+    ]
+  },
   "du_kien_kho_khan": [
     {
       "kho_khan": "HS thiếu vốn từ, trải nghiệm chủ đề",

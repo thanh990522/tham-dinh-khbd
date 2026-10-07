@@ -6,6 +6,7 @@
 // Căn cứ: references/quy-trinh-tham-dinh.md (bảng điểm chính thức năm học 2026–2027).
 
 import { THOI_QUEN, GIA_TRI } from './schema.js';
+import { isEnglishLesson } from './english.js';
 
 const blank = (s) => !s || !String(s).trim();
 const VERB_HS = /(\bHS\b|học sinh|\bSs\b|students?|pairs?|groups?|nhóm|cặp|mỗi em|từng em|cá nhân)/i;
@@ -267,6 +268,16 @@ export function validateKHBD(k, opts = {}) {
     const nTQ = tqSet.size;
     b6Struct.TQ = { diem: nTQ >= 4 ? 4 : nTQ === 3 ? 3 : nTQ >= 1 ? 2 : 0, toi_da: 4, so_tieu_chi: nTQ, tieu_chi: [...tqSet] };
     if (nTQ < 4) add('P2', 'Bước 6', 'TQ-4', `Trao quyền mới đáp ứng ${nTQ}/6 tiêu chí (cần ≥4).`, 'Bổ sung hoạt động trao quyền (lựa chọn, tự lập kế hoạch, điều phối nhóm, tự/đồng đánh giá...).');
+  }
+
+  // ─────────── ĐẶC THÙ TIẾNG ANH (chỉ góp ý P3, không tính điểm) ───────────
+  if (k.tieng_anh && isEnglishLesson(k)) {
+    const ta = k.tieng_anh;
+    const thieuStage = hd.filter((a) => blank(a.giai_doan_ta)).map((a) => a.id);
+    if (thieuStage.length) add('P3', 'Tiếng Anh', 'TA-STAGE', `Hoạt động chưa ghi stage: ${thieuStage.join(', ')}.`, 'Gán stage theo khung PPP/PDP (WARM-UP, PRESENTATION, PRE-READING…).');
+    const tietNgonNgu = ['Getting Started', 'A Closer Look 1', 'A Closer Look 2', 'Communication'].includes(ta.loai_tiet);
+    if (tietNgonNgu && !ta.phan_tich_ngon_ngu.length) add('P3', 'Tiếng Anh', 'TA-LA', `Tiết ${ta.loai_tiet} chưa có bảng Language analysis.`, 'Thêm 3–8 dòng Form | Pronunciation | Meaning | Vietnamese cho từ/cấu trúc trọng tâm.');
+    if (!ta.board_plan.length) add('P3', 'Tiếng Anh', 'TA-BP', 'Chưa có Board plan.', 'Thêm ≤ 8 dòng: Date, Unit – Lesson, từ vựng/cấu trúc chính, Homework.');
   }
 
   const lv = (diem, toi_da) => levelFromPct(diem / toi_da);

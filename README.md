@@ -50,17 +50,19 @@ Rà soát sơ bộ bản gốc ─► Tra cứu web ─► Claude soạn/nâng c
 8. **Tải lên file `.json`** (đã xuất từ lần trước, có thể đã chỉnh tay): kiểm tra lại và xuất Word mà không tốn phí AI.
 9. **Giữ hình ảnh của giáo viên**: tranh/ảnh trong file .docx gốc được chép sang bản mới đúng hoạt động sử dụng; ảnh chưa gắn được đưa vào phụ lục.
 10. **⚙ Cài đặt trên web**: nhập khoá API Claude (lưu trên trình duyệt của từng máy), sửa **6 tiêu chí Trao quyền**, điểm mục tiêu, số vòng tự sửa, tổ chuyên môn mặc định.
-11. Hiển thị tiến trình trực tiếp; mã truy cập tuỳ chọn; giới hạn số job chạy đồng thời. Làm việc hoàn toàn bằng **tải file lên – tải file về**, không cần Google Drive.
+11. **Thiết kế riêng cho môn Tiếng Anh** (Global Success): tự nhận loại tiết (Getting Started, A Closer Look 1/2, Communication, Skills 1/2, Looking Back & Project) và khung PPP / Pre–While–Post / TTT / Task-based; đầu trang *Subject – Grade · Week · Period*; bảng **Language analysis** (Form | Pronunciation | Meaning | Vietnamese equivalent); **Board plan**; bảng **Procedures** có cột Stage (WARM-UP, PRESENTATION, PRE-READING…); **Assumptions** dạng bảng; kiểm tra nhanh bằng CCQ/ICQ. Khung CV5512 và mọi tiêu chí thẩm định vẫn giữ nguyên.
+12. **Nhập Tuần (Week) và Tiết PPCT (Period)** trên trang; tự đọc từ file nếu giáo án có ghi; chọn nhiều tiết thì Period tự tăng (12, 13, 14…).
+13. Hiển thị tiến trình trực tiếp; mã truy cập tuỳ chọn; giới hạn số job chạy đồng thời. Làm việc hoàn toàn bằng **tải file lên – tải file về**, không cần Google Drive.
 
 ## Bản web dùng ngay trên claude.ai (không cần cài đặt, không cần khoá API)
 
 **https://claude.ai/artifact/PXU57eEkBH4MhmBPATsWKh** — trang tinh gọn chỉ làm một việc: **nâng cấp giáo án thành KHBD hoàn chỉnh**.
 
 1. Tải file giáo án `.docx` (một file có thể gồm nhiều tiết).
-2. Chọn tiết cần nâng cấp (mục *Tuỳ chọn* để chỉ định phương pháp, ngôn ngữ, tên GV… nếu muốn).
+2. Chọn tiết cần nâng cấp, nhập **Tuần · Week** và **Tiết PPCT · Period** (giáo án tiếng Anh: chọn thêm loại tiết hoặc để tự nhận) (mục *Tuỳ chọn* để chỉ định phương pháp, ngôn ngữ, tên GV… nếu muốn).
 3. Bấm **Nâng cấp KHBD** → tải về **một file Word KHBD hoàn chỉnh** (giữ ngữ liệu, bài tập, đáp án, hình ảnh gốc).
 
-Bên trong mỗi tiết: Claude soạn 2 phần (mục tiêu – rubric – dàn ý, rồi tiến trình) → bộ kiểm tra quy tắc + Claude chấm theo bảng điểm /100 → tự sửa phần còn lỗi (tối đa 2 vòng) đến khi ≥ 88/100 và không còn lỗi P1/P2. Claude chạy trên tài khoản claude.ai của người dùng; không tra cứu web, nên chi tiết SGK chưa chắc chắn được đánh dấu đỏ ở phụ lục cuối file.
+Bên trong mỗi tiết: Claude soạn 2 phần (mục tiêu – rubric – dàn ý, rồi tiến trình) → bộ kiểm tra quy tắc + Claude chấm theo bảng điểm /100 → tự sửa phần còn lỗi (tối đa 2 vòng) đến khi ≥ 88/100 và không còn lỗi P1/P2. Claude chạy trên tài khoản claude.ai của người dùng; yêu cầu cần đạt viết theo Chương trình GDPT 2018, không đối chiếu SGK hay PPCT của trường.
 
 Mã nguồn: `web-artifact/` · đóng gói lại: `npm run build:web` → `web-artifact/dist/`.
 
@@ -118,6 +120,8 @@ src/lib/validator.js     bộ kiểm tra theo quy tắc + tổng hợp điểm /
 src/lib/prompts.js       system prompt (nhúng tài liệu chuẩn) + danh mục bắt buộc
 src/lib/ai.js            gọi Claude API: tra cứu, soạn, sửa, chấm
 src/lib/pipeline.js      điều phối vòng soạn – kiểm – chấm – sửa
+src/lib/english.js       đặc thù môn Tiếng Anh: loại tiết, khung PPP/PDP, stage, nhãn song ngữ, đọc Week/Period
+src/lib/arrange.js       tự sắp xếp: trình tự, đánh số lại, cân 45 phút, gán stage tiếng Anh
 src/lib/render-docx.js   xuất Word KHBD (CV5512 / 4PP 3 cột) và báo cáo
 src/knowledge/           3 tài liệu chuẩn của skill (nguyên văn)
 public/                  giao diện web

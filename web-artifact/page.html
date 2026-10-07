@@ -74,7 +74,7 @@ h1 mark { background: none; color: var(--brand); }
 .lesson .t { font-weight: 600; overflow-wrap: anywhere; }
 .lesson .m { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--amber-soft); color: var(--amber); }
-.tag.red { background: var(--red-soft); color: var(--red); } .tag.ok { background: var(--good-soft); color: var(--good); }
+.tag.red { background: var(--red-soft); color: var(--red); } .tag.en { background: var(--band); color: var(--brand); font-weight: 600; } .tag.ok { background: var(--good-soft); color: var(--good); }
 .selall { justify-self: start; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 
 details.opts { border: 1px solid var(--rule); border-radius: 10px; }
@@ -85,8 +85,13 @@ details.opts[open] > summary::after { content: "–"; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 4px 14px 14px; }
 .grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 .grid .all { grid-column: 1 / -1; }
+.info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 14px 0 12px; }
+.info label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.info .all { grid-column: 1 / -1; margin: -4px 0 0; }
+.en-badge { display: flex; gap: 10px; align-items: baseline; font-size: 13px; color: var(--muted); border-left: 4px solid var(--brand); background: rgba(252, 219, 5, .10); padding: 8px 12px; border-radius: 0 8px 8px 0; margin-bottom: 12px; }
+.en-badge b { color: var(--ink); white-space: nowrap; }
 .check { display: flex !important; align-items: center; gap: 8px; color: var(--ink) !important; font-size: 14px !important; }
-input[type="text"], select, textarea { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
+input[type="text"], input[type="number"], select, textarea { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
 input[type="checkbox"] { accent-color: var(--brand-ink); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -138,6 +143,8 @@ footer { font-size: 12px; color: var(--muted); text-align: center; text-wrap: ba
 @media (max-width: 560px) {
   .step { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; }
   .grid { grid-template-columns: 1fr; }
+  .info { grid-template-columns: 1fr 1fr; }
+  .info .en-only { grid-column: 1 / -1; }
   .hero { padding-block: 26px 70px; }
 }
 @media (prefers-reduced-motion: reduce) { .bar i, .drop { transition: none; } .btn.primary:active { transform: none; } }
@@ -177,6 +184,19 @@ footer { font-size: 12px; color: var(--muted); text-align: center; text-wrap: ba
         <h2>Chọn tiết cần nâng cấp</h2>
         <div class="lessons" id="lessons"><p class="hint">Danh sách tiết sẽ hiện ở đây sau khi tải file.</p></div>
         <button class="selall" id="selAll" type="button" hidden>Chọn / bỏ chọn tất cả</button>
+        <div class="info" id="infoRow">
+          <label>Tuần · Week <input type="number" id="tuan" min="1" max="52" inputmode="numeric" placeholder="vd 3"></label>
+          <label>Tiết PPCT · Period <input type="number" id="tiet_ppct" min="1" max="200" inputmode="numeric" placeholder="vd 12"></label>
+          <label class="en-only" id="loaiTietBox" hidden>Loại tiết (Tiếng Anh)
+            <select id="loai_tiet">
+              <option value="">Tự nhận theo tên tiết</option>
+              <option>Getting Started</option><option>A Closer Look 1</option><option>A Closer Look 2</option><option>Communication</option>
+              <option>Skills 1</option><option>Skills 2</option><option>Looking Back &amp; Project</option><option>Review</option>
+            </select>
+          </label>
+          <p class="hint all" id="infoHint">In ở đầu KHBD. Chọn nhiều tiết: Period tự tăng theo thứ tự (12, 13, 14…).</p>
+        </div>
+        <div class="en-badge" id="enBadge" hidden><b>Tiếng Anh</b> Bố cục giáo án tiếng Anh: Week/Period, Language analysis, Board plan, bảng Procedures theo stage (PPP / Pre–While–Post), Assumptions, CCQ/ICQ.</div>
         <details class="opts">
           <summary>Tuỳ chọn (không bắt buộc)</summary>
           <div class="grid">

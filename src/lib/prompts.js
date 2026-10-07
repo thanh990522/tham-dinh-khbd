@@ -1,4 +1,5 @@
 import { PHUONG_PHAP } from './schema.js';
+import { GOI_Y_LOAI_TIET, KHUNG_TA } from './english.js';
 
 // Bỏ các mục vận hành (nộp theo tuần, Google Drive, sổ theo dõi, định dạng đầu ra của skill)
 // khỏi quy trình thẩm định: không liên quan tới việc soạn/chấm, chỉ làm prompt dài thêm.
@@ -79,7 +80,21 @@ D. Active Learning (Bước 7.D1): phút HS hoạt động (thoi_gian_phut − p
 E. 5 Giá trị & 7 Thói quen (Bước 7.D2): TỔNG số TLIM + giá trị cốt lõi là 1 hoặc 2 (chọn ít mà sâu), đúng tên + số thứ tự; mỗi mục có công cụ (với TLIM) và hanh_vi_quan_sat, được gắn vào hoạt động cụ thể; hoạt động chiêm nghiệm có câu hỏi với cham_vao_ids trỏ tới mục đó; có một dòng rubric với lien_ket_muc_tieu chứa id mục đó.
 F. Trao quyền (4PP): các mục trao quyền được gắn vào hoạt động, và hợp lại đáp ứng ≥4 tiêu chí TQ-a…TQ-f.
 G. Ứng dụng AI (Bước 7.D3) — chỉ khi meta.su_dung_ai=true: ghi khâu + công cụ phía GV kèm cách kiểm chứng; nếu HS được dùng: nhiệm vụ, giới hạn, khâu bắt buộc tự làm, cách lưu câu lệnh/dấu vết; danh_gia_phan_biet nêu rõ cách phân biệt tư duy HS với phần AI (vd trình bày trực tiếp, giải thích lập luận). AI KHÔNG làm thay phần tư duy cốt lõi của HS. Khi su_dung_ai=false: để các trường AI rỗng (trang bìa sẽ ghi "Không sử dụng AI").
-H. Biện pháp hỗ trợ HS gặp khó (ho_tro_hs) ở mọi hoạt động; dự kiến khó khăn & giải pháp; hướng dẫn về nhà.`;
+H. Biện pháp hỗ trợ HS gặp khó (ho_tro_hs) ở mọi hoạt động; dự kiến khó khăn & giải pháp; hướng dẫn về nhà.
+
+ĐẶC THÙ MÔN TIẾNG ANH (chỉ áp dụng khi môn là Tiếng Anh; môn khác để rỗng toàn bộ khối tieng_anh và giai_doan_ta)
+- Khung CV5512 và mọi mục A–H ở trên vẫn bắt buộc; phần dưới đây bổ sung cách trình bày quen dùng của GV tiếng Anh (Global Success), không thay thế.
+- tieng_anh.loai_tiet: nhận từ tên bài/bản gốc. tieng_anh.khung và trình tự stage gợi ý:
+${Object.entries(GOI_Y_LOAI_TIET).map(([k, v]) => `  • ${k}: ${KHUNG_TA[v.khung]} — ${v.stages}`).join('\n')}
+- Mỗi hoạt động gán giai_doan_ta (stage) đúng khung, theo trình tự trên; vẫn gán loai (CV5512) và buoc_4pp tương ứng. Hai hoạt động cuối: REFLECTION (loai chiem_nghiem) rồi CONSOLIDATION (loai cung_co).
+- Mục tiêu viết theo mẫu "Ss will be able to + động từ đo được" (khi ngôn ngữ nội dung là tiếng Anh). kien_thuc nêu cụ thể từ vựng/cấu trúc/âm của bài (lấy từ bản gốc). nang_luc_dac_thu theo 4 kỹ năng nghe–nói–đọc–viết của CT 2018 (vd "Ss can listen and read for specific information about hobbies").
+- tieng_anh.phan_tich_ngon_ngu (Language analysis) 3–8 dòng cho các từ/cấu trúc trọng tâm có trong bản gốc: form; pronunciation (IPA chuẩn từ điển Cambridge/Oxford, có dấu trọng âm; không chắc thì để rỗng); meaning (tiếng Anh, ≤ 8 từ); vietnamese. Bắt buộc với Getting Started, A Closer Look 1/2, Communication; tiết kỹ năng chỉ ghi từ khoá của bài đọc/nghe.
+- tieng_anh.board_plan ≤ 8 dòng: "Date: …", "Unit … – Lesson …", từ vựng/cấu trúc chính, "Homework: …".
+- tieng_anh.trong_tam ≤ 15 từ.
+- Kiểm tra nhanh (kiem_tra_hieu_bai) dùng CCQs (concept checking questions) cho nghĩa/cấu trúc và ICQs (instruction checking questions) trước nhiệm vụ cặp/nhóm; ghi 1–2 câu CCQ/ICQ cụ thể.
+- Dạy từ vựng theo trình tự elicit → model → choral/individual repetition → check (CCQ); tiết kỹ năng có nhiệm vụ PRE (dự đoán/từ khoá), WHILE (đọc/nghe lấy ý chính → chi tiết), POST (nói/viết vận dụng cá nhân hoá).
+- Ngữ liệu, câu hỏi, đáp án, instructions giữ tiếng Anh; phần mô tả tổ chức theo meta.ngon_ngu_noi_dung. Interaction ghi qua hinh_thuc (ca_lop = T-Ss, cap_doi = Pair work, nhom = Group work, ca_nhan = Individual).
+- du_kien_kho_khan theo kiểu Assumptions: khó khăn ngôn ngữ cụ thể (phát âm, cấu trúc dễ nhầm, từ mới) → giải pháp ngắn.`;
 }
 
 export function methodInstruction(phuongPhap) {
@@ -97,8 +112,9 @@ export function buildMetaBlock(opts) {
     opts.ten_bai && `Tên bài/chủ đề: ${opts.ten_bai}`,
     opts.bo_sach && `Bộ sách: ${opts.bo_sach}`,
     `Số tiết của KHBD: ${opts.so_tiet || 1}`,
-    opts.tiet_ppct && `Tiết PPCT: ${opts.tiet_ppct}`,
-    opts.tuan && `Tuần: ${opts.tuan}`,
+    opts.tiet_ppct && `Tiết PPCT (Period): ${opts.tiet_ppct}`,
+    opts.tuan && `Tuần (Week): ${opts.tuan}`,
+    opts.loai_tiet && `Loại tiết Tiếng Anh: ${opts.loai_tiet}`,
     `Có sử dụng AI trong tiết: ${opts.su_dung_ai ? 'CÓ' : 'KHÔNG'}`,
     `Ngôn ngữ trình bày nội dung: ${opts.ngon_ngu || 'Tiếng Việt'}`,
     methodInstruction(opts.phuong_phap),

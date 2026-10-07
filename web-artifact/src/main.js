@@ -1,8 +1,18 @@
-import { readFile, preAudit, upgradeLesson, buildDocx, buildHtml, errMsg } from './engine.js';
+import { readFile, preAudit, upgradeLesson, buildDocx, buildHtml, errMsg, detectWeekPeriod, detectLessonType } from './engine.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const S = { parts: [], images: [], fileName: '', sample: null, downloads: null, busy: false, ctl: null, blob: null, html: '' };
+const S = { parts: [], images: [], fileName: '', sample: null, downloads: null, busy: false, ctl: null, blob: null, html: '', english: false };
+
+// Giáo án tiếng Anh: nhận từ ô Môn học hoặc nội dung file
+const EN_RE = /\b(english|tiếng anh)\b|getting started|a closer look|looking back|\bskills? [12]\b/i;
+const lessonType = (p) => detectLessonType(p.tieu_de) || detectLessonType(p.text.slice(0, 300));
+function updateEnglish() {
+  const mon = $('mon_hoc').value.trim();
+  S.english = mon ? /tiếng anh|english|anh văn/i.test(mon) : S.parts.some((p) => EN_RE.test(p.text.slice(0, 4000)));
+  $('loaiTietBox').hidden = !S.english;
+  $('enBadge').hidden = !S.english;
+}
 
 // Các giai đoạn của một tiết: [khoá, nhãn, % bắt đầu, % kết thúc, số ký tự dự kiến]
 const STAGES = [
@@ -44,6 +54,10 @@ async function onFile(file) {
     S.images = r.images;
     S.fileName = file.name.replace(/\.[^.]+$/, '');
     $('fileInfo').textContent = `${r.parts.length} tiết${r.images.length ? ` · ${r.images.length} hình` : ''}`;
+    const wp = detectWeekPeriod(r.parts[0]?.text);
+    if (wp.week && !$('tuan').value) $('tuan').value = wp.week;
+    if (wp.period && !$('tiet_ppct').value) $('tiet_ppct').value = wp.period;
+    updateEnglish();
     renderLessons();
   } catch (e) {
     S.parts = [];
@@ -72,7 +86,7 @@ function renderLessons() {
     row.className = 'lesson';
     row.innerHTML = `<input type="checkbox" value="${p.so}" ${i === 0 || S.parts.length <= 2 ? 'checked' : ''}>
       <span class="t">${esc(p.tieu_de)}</span>
-      <span class="m">${thieu.length ? `<span class="tag">bản gốc thiếu ${thieu.length}/${a.items.length} thành phần</span>` : '<span class="tag ok">đủ thành phần chính</span>'}${p1 ? '<span class="tag red">thiếu Chiêm nghiệm</span>' : ''}${a.thoi_gian.tong ? `<span class="tag ${a.thoi_gian.khop ? 'ok' : ''}">${a.thoi_gian.tong}/45 phút</span>` : ''}</span>`;
+      <span class="m">${S.english && lessonType(p) ? `<span class="tag en">${esc(lessonType(p))}</span>` : ''}${thieu.length ? `<span class="tag">bản gốc thiếu ${thieu.length}/${a.items.length} thành phần</span>` : '<span class="tag ok">đủ thành phần chính</span>'}${p1 ? '<span class="tag red">thiếu Chiêm nghiệm</span>' : ''}${a.thoi_gian.tong ? `<span class="tag ${a.thoi_gian.khop ? 'ok' : ''}">${a.thoi_gian.tong}/45 phút</span>` : ''}</span>`;
     box.appendChild(row);
   });
   box.querySelectorAll('input').forEach((c) => c.addEventListener('change', refresh));
@@ -80,11 +94,15 @@ function renderLessons() {
 }
 
 // ───── Bước 3: nâng cấp ─────
-function opts() {
+// idx: thứ tự của tiết trong các tiết được chọn — Period tự tăng (12, 13, 14…)
+function opts(part, idx = 0) {
   const v = (id) => $(id).value.trim();
+  const period = v('tiet_ppct');
   return {
-    truong: 'Trường Việt Anh', to_chuyen_mon: v('to_chuyen_mon'), giao_vien: v('giao_vien'), mon_hoc: v('mon_hoc'), lop: v('lop'),
-    ten_bai: '', bo_sach: 'Kết nối tri thức với cuộc sống', so_tiet: 1, phuong_phap: v('phuong_phap'),
+    truong: 'Trường Việt Anh', to_chuyen_mon: v('to_chuyen_mon'), giao_vien: v('giao_vien'), mon_hoc: v('mon_hoc') || (S.english ? 'Tiếng Anh' : ''), lop: v('lop'),
+    ten_bai: '', bo_sach: S.english ? 'Tiếng Anh Global Success (Kết nối tri thức với cuộc sống)' : 'Kết nối tri thức với cuộc sống', so_tiet: 1, phuong_phap: v('phuong_phap'),
+    tuan: v('tuan'), tiet_ppct: /^\d+$/.test(period) ? String(Number(period) + idx) : period,
+    loai_tiet: S.english ? v('loai_tiet') || (part ? lessonType(part) : '') : '',
     su_dung_ai: $('su_dung_ai').checked, ngon_ngu: v('ngon_ngu'), yeu_cau_them: v('yeu_cau_them'),
   };
 }
@@ -138,7 +156,7 @@ async function run() {
   let error = null;
   for (const [i, part] of parts.entries()) {
     try {
-      const r = await upgradeLesson({ sample: S.sample, opts: opts(), part, signal: S.ctl.signal, stage: (k, n) => rows[i].stage(k, n) });
+      const r = await upgradeLesson({ sample: S.sample, opts: opts(part, i), part, signal: S.ctl.signal, stage: (k, n) => rows[i].stage(k, n) });
       results.push(r);
       rows[i].finish(`${r.score.diem_100}/100`);
     } catch (e) {
@@ -300,6 +318,7 @@ $('selAll').addEventListener('click', () => {
   refresh();
 });
 $('run').addEventListener('click', run);
+$('mon_hoc').addEventListener('input', updateEnglish);
 S.sample = undefined;
 refresh();
 

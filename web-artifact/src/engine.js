@@ -22,6 +22,7 @@ const MAX_BYTES = 250000;
 const bytes = (s) => new TextEncoder().encode(s).length;
 
 export { preAudit };
+export { detectWeekPeriod, detectLessonType } from '../../src/lib/english.js';
 
 // ───────── Đọc file ─────────
 function imageSize(u8, type) {
@@ -75,14 +76,14 @@ export async function readFile(file) {
 
 // ───────── Gọi Claude ─────────
 const pick = (keys) => ({ ...KHBD_SCHEMA, properties: Object.fromEntries(keys.map((k) => [k, KHBD_SCHEMA.properties[k]])), required: keys });
-const KEYS_A = ['meta', 'can_cu_chuong_trinh', 'muc_tieu', 'thiet_bi_hoc_lieu', 'ung_dung_ai', 'rubric', 'bo_cau_hoi_dinh_huong', 'dac_thu_phuong_phap'];
+const KEYS_A = ['meta', 'can_cu_chuong_trinh', 'muc_tieu', 'thiet_bi_hoc_lieu', 'ung_dung_ai', 'rubric', 'bo_cau_hoi_dinh_huong', 'dac_thu_phuong_phap', 'tieng_anh'];
 const KEYS_B = ['hoat_dong', 'du_kien_kho_khan', 'huong_dan_ve_nha', 'ghi_chu_thay_doi'];
 const SCHEMA_A = (() => {
   const s = pick(KEYS_A);
   s.properties.dan_y_hoat_dong = {
     type: 'array',
     description: 'Dàn ý tiến trình để phần 2 bám theo: đủ hoạt động, mã HD1…, tổng phút = 45 × số tiết',
-    items: { type: 'object', properties: { id: { type: 'string' }, ten: { type: 'string' }, loai: { type: 'string' }, buoc_4pp: { type: 'string' }, thoi_gian_phut: { type: 'integer' }, muc_tieu_ids: { type: 'array', items: { type: 'string' } } } },
+    items: { type: 'object', properties: { id: { type: 'string' }, ten: { type: 'string' }, loai: { type: 'string' }, buoc_4pp: { type: 'string' }, giai_doan_ta: { type: 'string' }, thoi_gian_phut: { type: 'integer' }, muc_tieu_ids: { type: 'array', items: { type: 'string' } } } },
   };
   s.required = [...KEYS_A, 'dan_y_hoat_dong'];
   return s;
@@ -130,7 +131,7 @@ async function generate({ sample, opts, part, signal, stage }) {
   const a = await ask(sample, withOriginal(`${head}\n\n${goc}\n\nĐây là PHẦN 1/2. Trả về DUY NHẤT một đối tượng JSON đúng JSON Schema sau (gồm dan_y_hoat_dong — dàn ý tiến trình mà phần 2 sẽ viết chi tiết; mã hoạt động trong thiet_bi_hoc_lieu và rubric phải khớp dàn ý):\n${JSON.stringify(SCHEMA_A)}`, part.text), { signal, onChars: (n) => stage('soan1', n) });
 
   stage('soan2');
-  const b = await ask(sample, withOriginal(`${head}\n\n<phan_1_da_soan>\n${JSON.stringify(a)}\n</phan_1_da_soan>\n\n${goc}\n\nĐây là PHẦN 2/2. Viết chi tiết đúng các hoạt động trong dan_y_hoat_dong (giữ nguyên id, loai, buoc_4pp, thoi_gian_phut), dùng đúng các mã mục tiêu KT/NLC/NLDT/PC/TL/GT/TQ và rubric R.. của phần 1 sao cho MỌI mục tiêu đều có ít nhất một hoạt động thực hiện. Trả về DUY NHẤT một đối tượng JSON đúng JSON Schema sau:\n${JSON.stringify(SCHEMA_B)}`, part.text), { signal, onChars: (n) => stage('soan2', n) });
+  const b = await ask(sample, withOriginal(`${head}\n\n<phan_1_da_soan>\n${JSON.stringify(a)}\n</phan_1_da_soan>\n\n${goc}\n\nĐây là PHẦN 2/2. Viết chi tiết đúng các hoạt động trong dan_y_hoat_dong (giữ nguyên id, loai, buoc_4pp, giai_doan_ta, thoi_gian_phut), dùng đúng các mã mục tiêu KT/NLC/NLDT/PC/TL/GT/TQ và rubric R.. của phần 1 sao cho MỌI mục tiêu đều có ít nhất một hoạt động thực hiện. Trả về DUY NHẤT một đối tượng JSON đúng JSON Schema sau:\n${JSON.stringify(SCHEMA_B)}`, part.text), { signal, onChars: (n) => stage('soan2', n) });
 
   const { dan_y_hoat_dong: _, ...restA } = a || {};
   return fillBySchema({ ...restA, ...b }, KHBD_SCHEMA);
@@ -168,7 +169,7 @@ async function revise({ sample, opts, khbd, issues, g, signal, stage }) {
 export async function upgradeLesson({ sample, opts, part, signal, stage }) {
   const target = config.diem_muc_tieu;
   const passed = (s, v) => !s.co_p1 && s.diem_100 >= target && !v.issues.some((i) => i.muc_do === 'P1' || i.muc_do === 'P2');
-  let khbd = arrangeKHBD(await generate({ sample, opts, part, signal, stage }), config);
+  let khbd = arrangeKHBD(await generate({ sample, opts, part, signal, stage }), config, opts);
   const history = [];
   let v;
   let s;
@@ -178,7 +179,7 @@ export async function upgradeLesson({ sample, opts, part, signal, stage }) {
     s = tongHopDiem(v, g);
     history.push(s.diem_100);
     if (passed(s, v) || vong >= config.so_vong_tu_sua_toi_da) break;
-    khbd = arrangeKHBD(await revise({ sample, opts, khbd, issues: v.issues, g, signal, stage }), config);
+    khbd = arrangeKHBD(await revise({ sample, opts, khbd, issues: v.issues, g, signal, stage }), config, opts);
   }
   return { part, khbd, score: s, validation: v, history };
 }

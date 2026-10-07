@@ -2,6 +2,8 @@
 // Dùng cho structured outputs của Claude (mọi object: tất cả trường bắt buộc,
 // additionalProperties=false) và làm "hợp đồng dữ liệu" giữa AI ↔ bộ kiểm tra ↔ bộ xuất Word.
 
+import { LOAI_TIET_TA, KHUNG_TA, GIAI_DOAN_TA } from './english.js';
+
 const str = (description) => ({ type: 'string', description });
 const int = (description) => ({ type: 'integer', description });
 const bool = (description) => ({ type: 'boolean', description });
@@ -297,6 +299,7 @@ export const KHBD_SCHEMA = obj(
           ten: str('Tên hoạt động'),
           loai: en(LOAI_HOAT_DONG, 'Loại hoạt động'),
           buoc_4pp: en(BUOC_4PP, 'Bước trong tiến trình 5 bước 4PP'),
+          giai_doan_ta: en(GIAI_DOAN_TA, 'Stage của tiết Tiếng Anh (WARM-UP, PRESENTATION, PRE-READING…); môn khác để rỗng'),
           thoi_gian_phut: int('Số phút'),
           phut_gv_thuyet_giang: int('Số phút GV giảng/trình bày liên tục (≤10)'),
           muc_tieu_ids: arr(str('Mã mục tiêu ở phần I'), 'Mục tiêu chung mà hoạt động phục vụ'),
@@ -338,6 +341,27 @@ export const KHBD_SCHEMA = obj(
         'Một hoạt động'
       ),
       'III. Tiến trình dạy học'
+    ),
+    tieng_anh: obj(
+      {
+        loai_tiet: en(LOAI_TIET_TA, 'Loại tiết theo sách Global Success (chỉ môn Tiếng Anh; môn khác để rỗng)'),
+        khung: en(['', ...Object.keys(KHUNG_TA)], 'Khung tiết: PPP (tiết ngôn ngữ), PDP (tiết kỹ năng), TTT, TBLT (Looking Back & Project); môn khác để rỗng'),
+        trong_tam: str('Trọng tâm ngôn ngữ/kỹ năng của tiết, ≤ 15 từ (vd "Vocabulary: hobbies; Present simple for likes")'),
+        phan_tich_ngon_ngu: arr(
+          obj(
+            {
+              form: str('Từ/cụm từ/cấu trúc mục tiêu (lấy từ bản gốc)'),
+              pronunciation: str('Phiên âm IPA chuẩn (vd /ˈhɒbi/); không chắc thì để rỗng'),
+              meaning: str('Nghĩa/cách dùng ngắn gọn bằng tiếng Anh (≤ 8 từ)'),
+              vietnamese: str('Nghĩa tiếng Việt tương đương'),
+            },
+            'Một dòng phân tích ngôn ngữ'
+          ),
+          'Language analysis: 3–8 mục từ vựng/cấu trúc trọng tâm (môn khác để rỗng)'
+        ),
+        board_plan: arr(str('Một dòng trên bảng'), 'Board plan: ≤ 8 dòng (Date · Unit/Lesson · Vocabulary · Structure · Homework); môn khác để rỗng'),
+      },
+      'Phần đặc thù môn Tiếng Anh (môn khác: để rỗng toàn bộ)'
     ),
     du_kien_kho_khan: arr(obj({ kho_khan: str('Khó khăn dự kiến'), giai_phap: str('Giải pháp') }, 'Dự kiến'), 'Dự kiến khó khăn & giải pháp'),
     huong_dan_ve_nha: str('Hướng dẫn tự học ở nhà / chuẩn bị bài sau'),

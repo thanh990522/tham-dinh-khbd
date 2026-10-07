@@ -58,7 +58,7 @@ export async function runJob(job, { parts, input, opts, mode, config }, deps = {
       if (chars % 4000 < d.length) job.emit({ type: 'progress', msg: `${nhan}: đang viết… ${Math.round(chars / 1000)}k ký tự` });
     };
     let khbd = await generateKHBD({ config, opts: { ...opts, ten_bai: opts.ten_bai || part.tieu_de }, input: partInput, researchResult, mode: genMode, onText });
-    if (genMode !== 'trich_xuat') khbd = arrangeKHBD(khbd, config);
+    if (genMode !== 'trich_xuat') khbd = arrangeKHBD(khbd, config, opts);
     if (researchResult && genMode !== 'trich_xuat') {
       const ng = new Set([...khbd.can_cu_chuong_trinh.nguon_tham_khao, ...researchResult.nguon]);
       khbd.can_cu_chuong_trinh.nguon_tham_khao = [...ng];
@@ -77,7 +77,7 @@ export async function runJob(job, { parts, input, opts, mode, config }, deps = {
       log(`${nhan}: vòng ${vong} — ${s.diem_100}/100 · ${s.xep_loai} · ${s.ket_luan}`, { level: datYeuCau(s, v, target) ? 'ok' : 'info' });
       if (datYeuCau(s, v, target) || vong >= maxVong) break;
       log(`${nhan}: tự sửa vòng ${vong + 1}…`);
-      khbd = arrangeKHBD(await reviseKHBD({ config, opts, khbd, issues: v.issues, grade: g, input: partInput, onText }), config);
+      khbd = arrangeKHBD(await reviseKHBD({ config, opts, khbd, issues: v.issues, grade: g, input: partInput, onText }), config, opts);
     }
     results.push({ part, pre, research: researchResult, khbd, validation: v, grade: g, score: s, history });
   }

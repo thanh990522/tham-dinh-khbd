@@ -82,3 +82,18 @@ test('xuất Word chèn ảnh gốc tại [HÌNH n] và phụ lục ảnh chưa 
   assert.match(zip, /word\/media\//);
   assert.equal(buf.subarray(0, 2).toString(), 'PK');
 });
+
+test('KHBD Tiếng Anh: đầu trang Week/Period, Language analysis, Board plan, cột Stage, bảng Assumptions', async () => {
+  const mammoth = (await import('mammoth')).default;
+  const k = sample();
+  k.meta.tuan = '3';
+  k.meta.tiet_ppct = '12';
+  const { value } = await mammoth.extractRawText({ buffer: await renderKHBDDocx([k], config) });
+  for (const s of ['Week: 3', 'Period: 12', 'Subject: English – Grade 7', 'Lesson: Getting Started', 'Language analysis', 'Pronunciation', '/ˈpɒpjələr/', 'Board plan', 'WARM-UP', 'PRODUCTION', 'Anticipated difficulties', 'HOMEWORK']) assert.ok(value.includes(s), `thiếu "${s}"`);
+  const t = sample();
+  t.meta.mon_hoc = 'Ngữ văn';
+  t.meta.ngon_ngu_noi_dung = 'Tiếng Việt';
+  t.tieng_anh.loai_tiet = '';
+  const v2 = (await mammoth.extractRawText({ buffer: await renderKHBDDocx([t], config) })).value;
+  assert.ok(v2.includes('Tiết PPCT') && !v2.includes('Language analysis') && !v2.includes('WARM-UP'));
+});

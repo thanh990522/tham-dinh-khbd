@@ -5,7 +5,7 @@ import {
 } from 'docx';
 import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from './schema.js';
 import { evidence, activityTags } from './active-learning.js';
-import { isEnglishLesson } from './arrange.js';
+import { isEnglishLesson, HEAD, KHUNG_TA, weekPeriod } from './english.js';
 
 const FONT = 'Times New Roman';
 const CONTENT_W = 9355; // A4, lề trái 3cm, phải 1.5cm (twip)
@@ -81,17 +81,21 @@ function tenPP(k) {
 // ───────── KHBD ─────────
 function biaKHBD(k, config) {
   const m = k.meta;
+  const en = isEnglishLesson(k);
+  const H = HEAD[en ? 'en' : 'vi'];
+  const ta = k.tieng_anh || {};
   return [
     table(
       [[
         [para([run((m.truong || config.truong).toUpperCase(), { bold: true })], { align: AlignmentType.CENTER }), para(m.to_chuyen_mon ? `TỔ: ${m.to_chuyen_mon.toUpperCase()}` : 'TỔ CHUYÊN MÔN: ……………', { align: AlignmentType.CENTER }), para([run(config.khau_hieu, { italics: true, size: 22 })], { align: AlignmentType.CENTER })],
-        [para([run(`Môn: ${m.mon_hoc} – Lớp ${m.lop}`, { bold: true })], { align: AlignmentType.CENTER }), para(`Tiết PPCT: ${m.tiet_ppct || '……'}   ·   Tuần: ${m.tuan || '……'}`, { align: AlignmentType.CENTER }), para(`Giáo viên: ${m.giao_vien || '……………………'}`, { align: AlignmentType.CENTER })],
+        [para([run(en ? `${H.mon} – ${H.lop} ${m.lop}` : `Môn: ${m.mon_hoc} – Lớp ${m.lop}`, { bold: true })], { align: AlignmentType.CENTER }), para([run(weekPeriod(m, en), { bold: en })], { align: AlignmentType.CENTER }), para(`${en ? H.giaoVien : 'Giáo viên'}: ${m.giao_vien || '……………………'}`, { align: AlignmentType.CENTER })],
       ]],
       [CONTENT_W / 2, CONTENT_W / 2],
       { noBorder: true, header: false }
     ),
-    para([run('KẾ HOẠCH BÀI DẠY', { bold: true, size: 32 })], { align: AlignmentType.CENTER, before: 240 }),
+    para([run(H.title, { bold: true, size: 32 })], { align: AlignmentType.CENTER, before: 240 }),
     para([run(m.ten_bai, { bold: true, size: 28 })], { align: AlignmentType.CENTER }),
+    ...(en && (ta.loai_tiet || ta.khung) ? [para([run(`${H.loaiTiet}: `, { bold: true }), run(ta.loai_tiet || '—'), run(`   ·   ${H.khung}: `, { bold: true }), run(KHUNG_TA[ta.khung] || '—')], { align: AlignmentType.CENTER })] : []),
     para([run(`${m.so_tiet} tiết · `), run('Phương pháp: ', { bold: true }), run(tenPP(k)), run(` · ${m.su_dung_ai ? 'Có sử dụng AI' : 'Không sử dụng AI'}`, { italics: true })], { align: AlignmentType.CENTER, after: 160 }),
   ];
 }
@@ -99,8 +103,9 @@ function biaKHBD(k, config) {
 function mucTieuKHBD(k) {
   const mt = k.muc_tieu;
   const is4PP = k.meta.phuong_phap !== 'THUONG';
+  const H = HEAD[isEnglishLesson(k) ? 'en' : 'vi'];
   const items = (arr) => arr.map((x) => bullet([run(`[${x.id}] `, { bold: true }), run(x.noi_dung)]));
-  const out = [h('I. MỤC TIÊU'), h('1. Về kiến thức', 2), ...items(mt.kien_thuc), h('2. Về năng lực', 2), para([run('a) Năng lực chung:', { italics: true, bold: true })]), ...items(mt.nang_luc_chung), para([run('b) Năng lực đặc thù:', { italics: true, bold: true })]), ...items(mt.nang_luc_dac_thu), h('3. Về phẩm chất', 2), ...items(mt.pham_chat)];
+  const out = [h(H.mucTieu), h(H.kienThuc, 2), ...items(mt.kien_thuc), h(H.nangLuc, 2), para([run(H.nlChung, { italics: true, bold: true })]), ...items(mt.nang_luc_chung), para([run(H.nlDacThu, { italics: true, bold: true })]), ...items(mt.nang_luc_dac_thu), h(H.phamChat, 2), ...items(mt.pham_chat)];
   const tlim = mt.tlim.map((t) => bullet([run(`[${t.id}] Thói quen ${t.thoi_quen_so} – ${t.ten_thoi_quen || THOI_QUEN[t.thoi_quen_so]}`, { bold: true }), run(` · Công cụ: ${t.cong_cu} · Biểu hiện: ${t.hanh_vi_quan_sat}`)]));
   const gt = mt.gia_tri_cot_loi.map((g) => bullet([run(`[${g.id}] Giá trị ${g.gia_tri_so} – ${g.ten_gia_tri || GIA_TRI[g.gia_tri_so]}`, { bold: true }), run(` · Biểu hiện: ${g.hanh_vi_quan_sat}`)]));
   let n = 3;
@@ -113,8 +118,25 @@ function mucTieuKHBD(k) {
 }
 
 function thietBiKHBD(k) {
+  const H = HEAD[isEnglishLesson(k) ? 'en' : 'vi'];
   const dong = (ai) => k.thiet_bi_hoc_lieu.filter((t) => t.doi_tuong === ai).map((t) => `${t.ten}${t.dung_cho_hoat_dong.length ? ` (${t.dung_cho_hoat_dong.join(', ')})` : ''}`).join('; ');
-  return [h('II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU'), ...['GV', 'HS'].filter((ai) => dong(ai)).map((ai) => label(`${ai === 'GV' ? 'Giáo viên' : 'Học sinh'}: `, dong(ai)))];
+  return [h(H.thietBi), ...['GV', 'HS'].filter((ai) => dong(ai)).map((ai) => label(ai === 'GV' ? H.gv : H.hs, dong(ai)))];
+}
+
+// Môn Tiếng Anh: trọng tâm, bảng phân tích ngôn ngữ (Form | Pronunciation | Meaning | Vietnamese), board plan
+function tiengAnhKHBD(k) {
+  if (!isEnglishLesson(k) || !k.tieng_anh) return [];
+  const ta = k.tieng_anh;
+  const H = HEAD.en;
+  const out = [];
+  if (ta.trong_tam) out.push(label(H.trongTam, ta.trong_tam));
+  if (ta.phan_tich_ngon_ngu.length) {
+    out.push(h(H.ngonNgu, 2), table([headerRow(H.ngonNguHead), ...ta.phan_tich_ngon_ngu.map((x) => [x.form, x.pronunciation, x.meaning, x.vietnamese])], [2700, 2100, 2555, 2000], { size: 22 }));
+  }
+  if (ta.board_plan.length) {
+    out.push(h(H.bang, 2), table([[cell(ta.board_plan.map((l) => para(l, { size: 22, before: 0, after: 20 })), { w: CONTENT_W })]], [CONTENT_W], { header: false }));
+  }
+  return out;
 }
 
 function aiKHBD(k) {
@@ -229,26 +251,40 @@ function procedureCell(a, L) {
   return out;
 }
 
-function tienTrinhBang(k) {
-  const L = PROC_LABELS[isEnglishLesson(k) ? 'en' : 'vi'];
+// Cột "Stage": tiết Tiếng Anh ghi stage (WARM-UP, PRESENTATION…) đứng đầu, sau đó tên hoạt động và bước 4PP/CV5512
+export function stageLines(a, k) {
   const is4PP = k.meta.phuong_phap !== 'THUONG';
+  const buoc = is4PP ? TEN_BUOC_4PP[a.buoc_4pp] : TEN_LOAI_HOAT_DONG[a.loai];
+  return { stage: isEnglishLesson(k) ? a.giai_doan_ta || '' : '', ten: `${a.id}. ${a.ten}`, buoc };
+}
+
+function tienTrinhBang(k) {
+  const en = isEnglishLesson(k);
+  const L = PROC_LABELS[en ? 'en' : 'vi'];
   const rows = [headerRow(L.head)];
   for (const a of k.hoat_dong) {
+    const st = stageLines(a, k);
     rows.push([
-      [para([run(`${a.id}. ${a.ten}`, { bold: true, size: 22 })]), para([run(is4PP ? TEN_BUOC_4PP[a.buoc_4pp] : TEN_LOAI_HOAT_DONG[a.loai], { italics: true, size: 20 })])],
+      [...(st.stage ? [para([run(st.stage, { bold: true, size: 22, color: '1F3864' })])] : []), para([run(st.ten, { bold: !st.stage, size: 22 })]), para([run(st.buoc, { italics: true, size: 20 })])],
       [para([run(a.muc_tieu_hoat_dong, { size: 22 })]), para([run(`(${lienKet(a)})`, { italics: true, size: 20 })])],
       procedureCell(a, L),
       [para(L.inter[a.hinh_thuc] || '', { size: 22, align: AlignmentType.CENTER })],
       [para([run(`${a.thoi_gian_phut} ${L.min}`, { bold: true, size: 22 })], { align: AlignmentType.CENTER })],
     ]);
   }
-  return [h(isEnglishLesson(k) ? 'III. TIẾN TRÌNH DẠY HỌC (PROCEDURES)' : 'III. TIẾN TRÌNH DẠY HỌC'), para([run(L.legend, { italics: true, size: 20 })]), table(rows, [2100, 2300, 7400, 1500, 1100], { size: 22 })];
+  return [h(HEAD[en ? 'en' : 'vi'].tienTrinh), para([run(L.legend, { italics: true, size: 20 })]), table(rows, [2100, 2300, 7400, 1500, 1100], { size: 22 })];
 }
 
 function cuoiKHBD(k) {
+  const en = isEnglishLesson(k);
+  const H = HEAD[en ? 'en' : 'vi'];
   const out = [];
-  if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), ...k.du_kien_kho_khan.map((x) => bullet(`${x.kho_khan} → ${x.giai_phap}`)));
-  if (k.huong_dan_ve_nha) out.push(h('V. HƯỚNG DẪN TỰ HỌC Ở NHÀ'), ...lines(k.huong_dan_ve_nha));
+  if (k.du_kien_kho_khan.length) {
+    out.push(h(H.khoKhan));
+    if (en) out.push(table([headerRow(H.khoKhanHead), ...k.du_kien_kho_khan.map((x) => [x.kho_khan, x.giai_phap])], [4677, 4678], { size: 22 }));
+    else out.push(...k.du_kien_kho_khan.map((x) => bullet(`${x.kho_khan} → ${x.giai_phap}`)));
+  }
+  if (k.huong_dan_ve_nha) out.push(h(H.veNha), ...lines(k.huong_dan_ve_nha));
   const cc = k.can_cu_chuong_trinh;
   out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (CHƯƠNG TRÌNH GDPT 2018)'), ...cc.yeu_cau_can_dat.map((y) => bullet(y)));
   return out;
@@ -262,7 +298,7 @@ function phuLucHinh(k, refs) {
 }
 
 export function khbdSections(k, config, refs) {
-  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k)];
+  const portrait = [...biaKHBD(k, config), ...mucTieuKHBD(k), ...thietBiKHBD(k), ...tiengAnhKHBD(k), ...aiKHBD(k), ...dacThuKHBD(k), ...cauHoiKHBD(k), ...rubricKHBD(k)];
   return [
     { properties: pagePortrait(), children: portrait },
     { properties: pageLandscape(), children: tienTrinhBang(k) },

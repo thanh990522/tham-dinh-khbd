@@ -1,9 +1,9 @@
 // Bản HTML của KHBD (cùng bố cục với file Word) — để xem trước trên trang và sao chép dán vào Word.
 // Dùng style nội tuyến vì khi dán, Word giữ style nội tuyến tốt nhất.
-import { PHUONG_PHAP, TEN_LOAI_HOAT_DONG, TEN_BUOC_4PP, THOI_QUEN, GIA_TRI } from '../../src/lib/schema.js';
+import { PHUONG_PHAP, THOI_QUEN, GIA_TRI } from '../../src/lib/schema.js';
 import { evidence, activityTags } from '../../src/lib/active-learning.js';
-import { isEnglishLesson } from '../../src/lib/arrange.js';
-import { PROC_LABELS } from '../../src/lib/render-docx.js';
+import { isEnglishLesson, HEAD, KHUNG_TA, weekPeriod } from '../../src/lib/english.js';
+import { PROC_LABELS, stageLines } from '../../src/lib/render-docx.js';
 
 const HL = 'background:#ffeb3b;color:#000;padding:0 2px;';
 
@@ -43,14 +43,18 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
     const m = k.meta;
     const mt = k.muc_tieu;
     const is4PP = m.phuong_phap !== 'THUONG';
+    const en = isEnglishLesson(k);
+    const H = HEAD[en ? 'en' : 'vi'];
+    const ta = k.tieng_anh || { phan_tich_ngon_ngu: [], board_plan: [] };
     const out = [];
-    out.push(`<table style="border-collapse:collapse;width:100%;"><tr><td style="${F}text-align:center;width:50%;"><b>${esc((m.truong || config.truong).toUpperCase())}</b><br>${esc(m.to_chuyen_mon ? `TỔ: ${m.to_chuyen_mon.toUpperCase()}` : 'TỔ CHUYÊN MÔN: ……………')}<br><i>${esc(config.khau_hieu)}</i></td><td style="${F}text-align:center;"><b>Môn: ${esc(m.mon_hoc)} – Lớp ${esc(m.lop)}</b><br>Tiết PPCT: ${esc(m.tiet_ppct || '……')} · Tuần: ${esc(m.tuan || '……')}<br>Giáo viên: ${esc(m.giao_vien || '……………………')}</td></tr></table>`);
-    out.push(p('<b>KẾ HOẠCH BÀI DẠY</b>', 'text-align:center;font-size:16pt;margin-top:12pt;'));
+    out.push(`<table style="border-collapse:collapse;width:100%;"><tr><td style="${F}text-align:center;width:50%;"><b>${esc((m.truong || config.truong).toUpperCase())}</b><br>${esc(m.to_chuyen_mon ? `TỔ: ${m.to_chuyen_mon.toUpperCase()}` : 'TỔ CHUYÊN MÔN: ……………')}<br><i>${esc(config.khau_hieu)}</i></td><td style="${F}text-align:center;"><b>${esc(en ? `${H.mon} – ${H.lop} ${m.lop}` : `Môn: ${m.mon_hoc} – Lớp ${m.lop}`)}</b><br>${en ? `<b>${esc(weekPeriod(m, en))}</b>` : esc(weekPeriod(m, en))}<br>${en ? H.giaoVien : 'Giáo viên'}: ${esc(m.giao_vien || '……………………')}</td></tr></table>`);
+    out.push(p(`<b>${esc(H.title)}</b>`, 'text-align:center;font-size:16pt;margin-top:12pt;'));
     out.push(p(`<b>${esc(m.ten_bai)}</b>`, 'text-align:center;font-size:14pt;'));
+    if (en && (ta.loai_tiet || ta.khung)) out.push(p(`<b>${H.loaiTiet}:</b> ${esc(ta.loai_tiet || '—')} · <b>${H.khung}:</b> ${esc(KHUNG_TA[ta.khung] || '—')}`, 'text-align:center;'));
     out.push(p(`${esc(m.so_tiet)} tiết · <b>Phương pháp:</b> ${esc(PHUONG_PHAP[m.phuong_phap] || m.phuong_phap)} · <i>${m.su_dung_ai ? 'Có sử dụng AI' : 'Không sử dụng AI'}</i>`, 'text-align:center;margin-bottom:8pt;'));
 
     const items = (arr) => arr.map((x) => li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}`)).join('');
-    out.push(h('I. MỤC TIÊU'), h('1. Về kiến thức', 2), items(mt.kien_thuc), h('2. Về năng lực', 2), p('<b><i>a) Năng lực chung:</i></b>'), items(mt.nang_luc_chung), p('<b><i>b) Năng lực đặc thù:</i></b>'), items(mt.nang_luc_dac_thu), h('3. Về phẩm chất', 2), items(mt.pham_chat));
+    out.push(h(H.mucTieu), h(H.kienThuc, 2), items(mt.kien_thuc), h(H.nangLuc, 2), p(`<b><i>${esc(H.nlChung)}</i></b>`), items(mt.nang_luc_chung), p(`<b><i>${esc(H.nlDacThu)}</i></b>`), items(mt.nang_luc_dac_thu), h(H.phamChat, 2), items(mt.pham_chat));
     let num = 3;
     if (is4PP || mt.tlim.length || mt.gia_tri_cot_loi.length) {
       out.push(h(`${++num}. TLIM & Giá trị cốt lõi`, 2));
@@ -66,7 +70,12 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
     evidence(k).forEach((e) => out.push(p(`<b style="color:${e.ok ? '#2e7d32' : '#c00000'}">${e.ok ? '✓' : '✗'}</b> ${esc(e.text)}`, 'margin-left:28pt;font-size:12pt;')));
 
     const tb = (ai) => k.thiet_bi_hoc_lieu.filter((x) => x.doi_tuong === ai).map((x) => `${t(x.ten)}${x.dung_cho_hoat_dong.length ? ` (${esc(x.dung_cho_hoat_dong.join(', '))})` : ''}`).join('; ');
-    out.push(h('II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU'), ...['GV', 'HS'].filter((ai) => tb(ai)).map((ai) => lb(`${ai === 'GV' ? 'Giáo viên' : 'Học sinh'}: `, tb(ai))));
+    out.push(h(H.thietBi), ...['GV', 'HS'].filter((ai) => tb(ai)).map((ai) => lb(ai === 'GV' ? H.gv : H.hs, tb(ai))));
+    if (en) {
+      if (ta.trong_tam) out.push(lb(H.trongTam, t(ta.trong_tam)));
+      if (ta.phan_tich_ngon_ngu.length) out.push(h(H.ngonNgu, 2), table(H.ngonNguHead, ta.phan_tich_ngon_ngu.map((x) => [t(x.form), t(x.pronunciation), t(x.meaning), t(x.vietnamese)]), [29, 22, 27, 22]));
+      if (ta.board_plan.length) out.push(h(H.bang, 2), `<table style="border-collapse:collapse;width:100%;margin:4pt 0;"><tr><td style="${TD}${F}font-size:12pt;">${ta.board_plan.map((l) => t(l)).join('<br>')}</td></tr></table>`);
+    }
 
     const ai = k.ung_dung_ai;
     if (m.su_dung_ai) {
@@ -119,7 +128,7 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
       out.push(table(['Tiêu chí', 'Tốt', 'Đạt', 'Chưa đạt'], r.tieu_chi.map((x) => [`${t(x.ten)}${x.lien_ket_muc_tieu.length ? ` (${esc(x.lien_ket_muc_tieu.join(', '))})` : ''}`, t(x.tot), t(x.dat), t(x.chua_dat)]), [22, 26, 26, 26]));
     });
 
-    const L = PROC_LABELS[isEnglishLesson(k) ? 'en' : 'vi'];
+    const L = PROC_LABELS[en ? 'en' : 'vi'];
     const proc = (a) => {
       const c = a.to_chuc;
       const tags = activityTags(a);
@@ -134,17 +143,24 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
       if (a.cau_hoi_chiem_nghiem.length) x.push(p(`<b>${esc(L.reflect)}</b>`), a.cau_hoi_chiem_nghiem.map((q) => li(`${t(q.hoi)}${q.cham_vao_ids.length ? ` (${esc(q.cham_vao_ids.join(', '))})` : ''}`)).join(''));
       return x.join('');
     };
-    out.push(h(isEnglishLesson(k) ? 'III. TIẾN TRÌNH DẠY HỌC (PROCEDURES)' : 'III. TIẾN TRÌNH DẠY HỌC'), p(`<i>${esc(L.legend)}</i>`, 'font-size:11pt;'));
+    out.push(h(H.tienTrinh), p(`<i>${esc(L.legend)}</i>`, 'font-size:11pt;'));
+    const stageCell = (a) => {
+      const st = stageLines(a, k);
+      return `${st.stage ? p(`<b style="color:#1f3864">${esc(st.stage)}</b>`) : ''}${p(st.stage ? t(st.ten) : `<b>${t(st.ten)}</b>`)}${p(`<i>${esc(st.buoc)}</i>`, 'font-size:11pt;')}`;
+    };
     out.push(table(L.head, k.hoat_dong.map((a) => [
-      `${p(`<b>${esc(a.id)}. ${t(a.ten)}</b>`)}${p(`<i>${esc(is4PP ? TEN_BUOC_4PP[a.buoc_4pp] : TEN_LOAI_HOAT_DONG[a.loai])}</i>`, 'font-size:11pt;')}`,
+      stageCell(a),
       `${p(t(a.muc_tieu_hoat_dong))}${p(`<i>(${esc(lienKet(a))})</i>`, 'font-size:11pt;')}`,
       proc(a),
       p(esc(L.inter[a.hinh_thuc] || ''), 'text-align:center;'),
       p(`<b>${esc(a.thoi_gian_phut)} ${esc(L.min)}</b>`, 'text-align:center;'),
     ]), [15, 16, 51, 10, 8]));
 
-    if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), k.du_kien_kho_khan.map((x) => li(`${t(x.kho_khan)} → ${t(x.giai_phap)}`)).join(''));
-    if (k.huong_dan_ve_nha) out.push(h('V. HƯỚNG DẪN TỰ HỌC Ở NHÀ'), p(t(k.huong_dan_ve_nha)));
+    if (k.du_kien_kho_khan.length) {
+      out.push(h(H.khoKhan));
+      out.push(en ? table(H.khoKhanHead, k.du_kien_kho_khan.map((x) => [t(x.kho_khan), t(x.giai_phap)]), [50, 50]) : k.du_kien_kho_khan.map((x) => li(`${t(x.kho_khan)} → ${t(x.giai_phap)}`)).join(''));
+    }
+    if (k.huong_dan_ve_nha) out.push(h(H.veNha), p(t(k.huong_dan_ve_nha)));
     const cc = k.can_cu_chuong_trinh;
     out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (CHƯƠNG TRÌNH GDPT 2018)'), cc.yeu_cau_can_dat.map((y) => li(t(y))).join(''));
     const used = new Set([...JSON.stringify(k).matchAll(/\[HÌNH (\d+)\]/g)].map((x) => Number(x[1])));
