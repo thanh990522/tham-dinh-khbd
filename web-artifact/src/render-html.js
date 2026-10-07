@@ -42,28 +42,26 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
     out.push(`<table style="border-collapse:collapse;width:100%;"><tr><td style="${F}text-align:center;width:50%;"><b>${esc((m.truong || config.truong).toUpperCase())}</b><br>${esc(m.to_chuyen_mon ? `TỔ: ${m.to_chuyen_mon.toUpperCase()}` : 'TỔ CHUYÊN MÔN: ……………')}<br><i>${esc(config.khau_hieu)}</i></td><td style="${F}text-align:center;"><b>Môn: ${esc(m.mon_hoc)} – Lớp ${esc(m.lop)}</b><br>Tiết PPCT: ${esc(m.tiet_ppct || '……')} · Tuần: ${esc(m.tuan || '……')}<br>Giáo viên: ${esc(m.giao_vien || '……………………')}</td></tr></table>`);
     out.push(p('<b>KẾ HOẠCH BÀI DẠY</b>', 'text-align:center;font-size:16pt;margin-top:12pt;'));
     out.push(p(`<b>${esc(m.ten_bai)}</b>`, 'text-align:center;font-size:14pt;'));
-    out.push(p(`Số tiết: ${esc(m.so_tiet)} · Bộ sách: ${esc(m.bo_sach || 'Kết nối tri thức với cuộc sống')}`, 'text-align:center;'));
-    out.push(p(`<b>Phương pháp:</b> ${esc(PHUONG_PHAP[m.phuong_phap] || m.phuong_phap)}`, 'text-align:center;'));
-    out.push(p(`<b><i>${m.su_dung_ai ? 'Có sử dụng AI (xem mục Ứng dụng AI)' : 'Không sử dụng AI'}</i></b>`, 'text-align:center;margin-bottom:10pt;'));
+    out.push(p(`${esc(m.so_tiet)} tiết · <b>Phương pháp:</b> ${esc(PHUONG_PHAP[m.phuong_phap] || m.phuong_phap)} · <i>${m.su_dung_ai ? 'Có sử dụng AI' : 'Không sử dụng AI'}</i>`, 'text-align:center;margin-bottom:8pt;'));
 
     const items = (arr) => arr.map((x) => li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}`)).join('');
     out.push(h('I. MỤC TIÊU'), h('1. Về kiến thức', 2), items(mt.kien_thuc), h('2. Về năng lực', 2), p('<b><i>a) Năng lực chung:</i></b>'), items(mt.nang_luc_chung), p('<b><i>b) Năng lực đặc thù:</i></b>'), items(mt.nang_luc_dac_thu), h('3. Về phẩm chất', 2), items(mt.pham_chat));
     if (is4PP || mt.tlim.length || mt.gia_tri_cot_loi.length) {
-      out.push(h(is4PP ? '4. TLIM (The Leader in Me) & Giá trị cốt lõi' : '4. Lồng ghép TLIM & Giá trị cốt lõi Việt Anh', 2));
-      mt.tlim.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Thói quen ${esc(x.thoi_quen_so)} – ${esc(x.ten_thoi_quen || THOI_QUEN[x.thoi_quen_so])}:</b> công cụ ${t(x.cong_cu)}. Hành vi quan sát: ${t(x.hanh_vi_quan_sat)}`)));
-      mt.gia_tri_cot_loi.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Giá trị ${esc(x.gia_tri_so)} – ${esc(x.ten_gia_tri || GIA_TRI[x.gia_tri_so])} (cấp ${esc(x.cap_bac)}):</b> ${t(x.hanh_vi_quan_sat)}`)));
+      out.push(h('4. TLIM & Giá trị cốt lõi', 2));
+      mt.tlim.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Thói quen ${esc(x.thoi_quen_so)} – ${esc(x.ten_thoi_quen || THOI_QUEN[x.thoi_quen_so])}</b> · Công cụ: ${t(x.cong_cu)} · Biểu hiện: ${t(x.hanh_vi_quan_sat)}`)));
+      mt.gia_tri_cot_loi.forEach((x) => out.push(li(`<b>[${esc(x.id)}] Giá trị ${esc(x.gia_tri_so)} – ${esc(x.ten_gia_tri || GIA_TRI[x.gia_tri_so])}</b> · Biểu hiện: ${t(x.hanh_vi_quan_sat)}`)));
     }
     if (is4PP || mt.trao_quyen.length) {
-      out.push(h(is4PP ? '5. Trao quyền (Empowerment)' : '5. Trao quyền cho học sinh', 2));
-      mt.trao_quyen.forEach((x) => out.push(li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}${x.tieu_chi_dap_ung.length ? ` <i>(đáp ứng: ${esc(x.tieu_chi_dap_ung.join(', '))})</i>` : ''}`)));
+      out.push(h('5. Trao quyền', 2));
+      mt.trao_quyen.forEach((x) => out.push(li(`<b>[${esc(x.id)}]</b> ${t(x.noi_dung)}`)));
     }
 
-    out.push(h('II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU'), table(['Thiết bị / học liệu', 'Người dùng', 'Dùng ở hoạt động'], k.thiet_bi_hoc_lieu.map((x) => [t(x.ten), esc(x.doi_tuong), esc(x.dung_cho_hoat_dong.join(', '))]), [60, 14, 26]));
+    const tb = (ai) => k.thiet_bi_hoc_lieu.filter((x) => x.doi_tuong === ai).map((x) => `${t(x.ten)}${x.dung_cho_hoat_dong.length ? ` (${esc(x.dung_cho_hoat_dong.join(', '))})` : ''}`).join('; ');
+    out.push(h('II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU'), ...['GV', 'HS'].filter((ai) => tb(ai)).map((ai) => lb(`${ai === 'GV' ? 'Giáo viên' : 'Học sinh'}: `, tb(ai))));
 
     const ai = k.ung_dung_ai;
-    out.push(h('Ứng dụng AI', 2));
-    if (!m.su_dung_ai) out.push(p('<i>Không sử dụng AI trong tiết học này.</i>'));
-    else {
+    if (m.su_dung_ai) {
+      out.push(h('Ứng dụng AI', 2));
       if (ai.giao_vien.length) out.push(table(['Khâu (phía GV)', 'Công cụ', 'Cách kiểm chứng'], ai.giao_vien.map((g) => [t(g.khau), t(g.cong_cu), t(g.cach_kiem_chung)]), [36, 22, 42]));
       out.push(lb('Học sinh được dùng AI: ', ai.hoc_sinh_duoc_dung ? 'Có' : 'Không'));
       if (ai.hoc_sinh_duoc_dung) out.push(lb('Nhiệm vụ được dùng: ', t(ai.nhiem_vu_hs_duoc_dung.join('; '))), lb('Giới hạn: ', t(ai.gioi_han)), lb('Khâu bắt buộc tự làm: ', t(ai.khau_bat_buoc_tu_lam.join('; '))), lb('Lưu dấu vết: ', t(ai.luu_dau_vet)));
@@ -101,24 +99,23 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
 
     const b = k.bo_cau_hoi_dinh_huong;
     out.push(h('BỘ CÂU HỎI ĐỊNH HƯỚNG'));
-    if (b.mo_ta) out.push(p(`<i>${t(b.mo_ta)}</i>`));
     b.nhom.forEach((n) => {
       out.push(p(`<b>${t(n.ten_nhom)}</b>`));
-      n.cau_hoi.forEach((q, i) => out.push(li(`${i + 1}. ${t(q.hoi)}${q.goi_y_dap_an ? ` <i>→ Gợi ý: ${t(q.goi_y_dap_an)}</i>` : ''}`)));
+      n.cau_hoi.forEach((q, i) => out.push(li(`${i + 1}. ${t(q.hoi)}${q.goi_y_dap_an ? ` <i>→ ${t(q.goi_y_dap_an)}</i>` : ''}`)));
     });
 
-    out.push(h('RUBRIC ĐÁNH GIÁ (công bố cho học sinh đầu tiết)'));
+    out.push(h('RUBRIC ĐÁNH GIÁ (công bố cho HS đầu tiết)'));
     k.rubric.forEach((r) => {
-      out.push(p(`<b>[${esc(r.id)}] ${t(r.ten)}</b> <i>— áp dụng: ${esc(r.ap_dung_cho.join(', '))}; ${t(r.thoi_diem_cong_bo)}</i>`));
+      out.push(p(`<b>[${esc(r.id)}] ${t(r.ten)}</b>${r.ap_dung_cho.length ? ` <i>(${esc(r.ap_dung_cho.join(', '))})</i>` : ''}`));
       out.push(table(['Tiêu chí', 'Tốt', 'Đạt', 'Chưa đạt'], r.tieu_chi.map((x) => [`${t(x.ten)}${x.lien_ket_muc_tieu.length ? ` (${esc(x.lien_ket_muc_tieu.join(', '))})` : ''}`, t(x.tot), t(x.dat), t(x.chua_dat)]), [22, 26, 26, 26]));
     });
 
     const toChuc = (a) => {
       const c = a.to_chuc;
-      const x = [lb('Bước 1 – Chuyển giao nhiệm vụ: ', t(c.giao_nhiem_vu)), lb('Bước 2 – Thực hiện nhiệm vụ: ', t(c.thuc_hien_nhiem_vu)), lb('Bước 3 – Báo cáo, thảo luận: ', t(c.bao_cao_thao_luan)), lb('Bước 4 – Kết luận, nhận định: ', t(c.ket_luan_nhan_dinh))];
-      if (a.phan_vai.length) x.push(lb('Phân vai: ', t(a.phan_vai.map((v) => `${v.vai} – ${v.nhiem_vu}`).join('; '))));
-      if (a.kiem_tra_hieu_bai.co) x.push(lb('Kiểm tra mức hiểu: ', t(`${a.kiem_tra_hieu_bai.cong_cu}. Điều chỉnh: ${a.kiem_tra_hieu_bai.cach_dieu_chinh}`)));
-      if (a.ho_tro_hs) x.push(lb('Hỗ trợ HS gặp khó: ', t(a.ho_tro_hs)));
+      const x = [lb('B1 Giao nhiệm vụ: ', t(c.giao_nhiem_vu)), lb('B2 Thực hiện: ', t(c.thuc_hien_nhiem_vu)), lb('B3 Báo cáo, thảo luận: ', t(c.bao_cao_thao_luan)), lb('B4 Kết luận: ', t(c.ket_luan_nhan_dinh))];
+      if (a.phan_vai.length) x.push(lb('Phân vai: ', t(a.phan_vai.map((v) => `${v.vai}: ${v.nhiem_vu}`).join('; '))));
+      if (a.kiem_tra_hieu_bai.co) x.push(lb('Kiểm tra nhanh: ', t(`${a.kiem_tra_hieu_bai.cong_cu}${a.kiem_tra_hieu_bai.cach_dieu_chinh ? ` → ${a.kiem_tra_hieu_bai.cach_dieu_chinh}` : ''}`)));
+      if (a.ho_tro_hs) x.push(lb('Hỗ trợ: ', t(a.ho_tro_hs)));
       if (a.dung_ai) x.push(lb('Dùng AI: ', t(a.dung_ai)));
       if (a.cau_hoi_chiem_nghiem.length) x.push(p('<b>Câu hỏi chiêm nghiệm:</b>'), a.cau_hoi_chiem_nghiem.map((q) => li(`${t(q.hoi)}${q.cham_vao_ids.length ? ` (${esc(q.cham_vao_ids.join(', '))})` : ''}`)).join(''));
       return x.join('');
@@ -128,8 +125,8 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
     if (is4PP) {
       out.push(table(['CÁC HOẠT ĐỘNG', 'NỘI DUNG – SẢN PHẨM', 'MỤC TIÊU (+ Thời gian)'], k.hoat_dong.map((a) => [
         `${p(`<b>${esc(a.id)}. ${t(a.ten)}</b>`)}${p(`<i>${esc(TEN_BUOC_4PP[a.buoc_4pp])} · ${esc(HINH_THUC[a.hinh_thuc])}</i>`)}${toChuc(a)}`,
-        `${lb('Nội dung: ', t(a.noi_dung))}${lb('Sản phẩm: ', t(a.san_pham))}${a.rubric_ids.length ? lb('Đánh giá: ', `rubric ${esc(a.rubric_ids.join(', '))}`) : ''}`,
-        `${p(t(a.muc_tieu_hoat_dong))}${p(`<i>Mục tiêu: ${esc(lienKet(a))}</i>`)}${p(`<b>⏱ ${esc(a.thoi_gian_phut)} phút</b>`)}`,
+        `${lb('Nội dung: ', t(a.noi_dung))}${lb('Sản phẩm: ', t(a.san_pham))}${a.rubric_ids.length ? p(`<i>Đánh giá theo ${esc(a.rubric_ids.join(', '))}</i>`) : ''}`,
+        `${p(`${t(a.muc_tieu_hoat_dong)} <i>(${esc(lienKet(a))})</i>`)}${p(`<b>${esc(a.thoi_gian_phut)} phút</b>`)}`,
       ]), [44, 32, 24]));
     } else {
       k.hoat_dong.forEach((a, i) => {
@@ -138,12 +135,10 @@ export function renderKHBDHtml(list, config, { images = [], refs = [] } = {}) {
       });
     }
 
-    if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), table(['Khó khăn dự kiến', 'Giải pháp'], k.du_kien_kho_khan.map((x) => [t(x.kho_khan), t(x.giai_phap)]), [46, 54]));
+    if (k.du_kien_kho_khan.length) out.push(h('IV. DỰ KIẾN KHÓ KHĂN VÀ GIẢI PHÁP'), k.du_kien_kho_khan.map((x) => li(`${t(x.kho_khan)} → ${t(x.giai_phap)}`)).join(''));
     if (k.huong_dan_ve_nha) out.push(h('V. HƯỚNG DẪN TỰ HỌC Ở NHÀ'), p(t(k.huong_dan_ve_nha)));
     const cc = k.can_cu_chuong_trinh;
-    out.push(h('PHỤ LỤC – CĂN CỨ CHƯƠNG TRÌNH'), p('<b>Yêu cầu cần đạt (GDPT 2018):</b>'), cc.yeu_cau_can_dat.map((y) => li(t(y))).join(''));
-    if (cc.noi_dung_sgk_tom_tat) out.push(lb('Nội dung SGK: ', t(cc.noi_dung_sgk_tom_tat)));
-    if (cc.nguon_tham_khao.length) out.push(p('<b>Nguồn tham khảo:</b>'), cc.nguon_tham_khao.map((n) => li(t(n))).join(''));
+    out.push(h('PHỤ LỤC – YÊU CẦU CẦN ĐẠT (GDPT 2018)'), cc.yeu_cau_can_dat.map((y) => li(t(y))).join(''));
     if (cc.ghi_chu_can_kiem_tra.length) out.push(p('<b style="color:#c00000">⚠ Giáo viên cần kiểm tra lại theo SGK:</b>'), cc.ghi_chu_can_kiem_tra.map((n) => li(`<span style="color:#c00000">${t(n)}</span>`)).join(''));
     const used = new Set([...JSON.stringify(k).matchAll(/\[HÌNH (\d+)\]/g)].map((x) => Number(x[1])));
     const left = (refs[idx] || []).filter((n) => !used.has(n) && IMG.has(n));

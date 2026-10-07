@@ -45,6 +45,21 @@ NGUYÊN TẮC KHI SOẠN / NÂNG CẤP
 5. Hình ảnh: ký hiệu [HÌNH n] trong bản gốc là hình minh hoạ của giáo viên. Giữ NGUYÊN ký hiệu đó (đúng số) ở vị trí tương ứng trong bản mới (vd trong noi_dung của hoạt động dạy từ vựng có dùng tranh). Không tự tạo ký hiệu [HÌNH n] mới.
 6. Chọn phương pháp (khi được yêu cầu tự chọn): LA cho bài ôn tập/luyện tập có thể phân hoá; CA cho bài có nhiều nội dung/kỹ năng độc lập; SD khi HS có thể chọn phương án/giải pháp rồi so sánh; CT khi có vấn đề cần phân tích nhiều khía cạnh để ra quyết định; THUONG khi không phương pháp nào phù hợp tự nhiên. Ghi lý do vào meta.ly_do_chon_phuong_phap.
 
+VĂN PHONG NGẮN GỌN (bắt buộc — KHBD dùng để dạy, không phải bài luận)
+- Viết kiểu ghi chú hành động: động từ + đối tượng, bỏ câu dẫn, bỏ từ đệm ("nhằm giúp các em", "một cách tích cực", "GV yêu cầu HS hãy…"). Được dùng "GV", "HS", dấu "→", dấu ";".
+- KHÔNG LẶP: mỗi ý chỉ viết một lần ở đúng chỗ của nó. to_chuc không chép lại noi_dung; muc_tieu_hoat_dong không chép lại mục tiêu phần I (chỉ ghi ngắn điều hoạt động đạt được, mã mục tiêu đã có trong muc_tieu_ids); không nhắc lại tên mã (KT1, TL1…) trong câu văn; bo_cau_hoi_dinh_huong không chép lại định hướng phương án đã có ở dac_thu_phuong_phap.
+- Giới hạn độ dài (không tính ngữ liệu/đáp án ngoại ngữ giữ từ bản gốc):
+  • Mỗi mục tiêu ≤ 20 từ. Số lượng: kien_thuc ≤ 3, nang_luc_chung ≤ 2, nang_luc_dac_thu ≤ 2, pham_chat ≤ 2, trao_quyen ≤ 3.
+  • TLIM/giá trị: cong_cu ≤ 8 từ; hanh_vi_quan_sat ≤ 18 từ.
+  • thiet_bi_hoc_lieu ≤ 6 dòng, mỗi dòng ≤ 10 từ.
+  • Hoạt động: ten ≤ 8 từ; muc_tieu_hoat_dong ≤ 15 từ; noi_dung ≤ 35 từ; san_pham ≤ 30 từ (đáp án ngắn gọn dạng 1. … 2. …); mỗi bước to_chuc ≤ 20 từ; phan_vai mỗi vai ≤ 10 từ; kiem_tra_hieu_bai.cong_cu ≤ 15 từ, cach_dieu_chinh ≤ 12 từ; ho_tro_hs ≤ 15 từ. Không dùng hoạt động nào thì để chuỗi rỗng cho trường không bắt buộc (dung_ai…).
+  • Rubric: 3–4 tiêu chí, mỗi ô ≤ 12 từ.
+  • Bộ câu hỏi định hướng: ≤ 4 nhóm, mỗi nhóm ≤ 3 câu; gợi ý đáp án ≤ 12 từ. mo_ta để rỗng.
+  • Câu hỏi chiêm nghiệm: 2–3 câu, mỗi câu ≤ 20 từ.
+  • du_kien_kho_khan ≤ 3 dòng, mỗi vế ≤ 12 từ; huong_dan_ve_nha ≤ 2 câu.
+  • can_cu_chuong_trinh: yeu_cau_can_dat ≤ 3 ý, mỗi ý ≤ 20 từ; noi_dung_sgk_tom_tat ≤ 40 từ; ghi_chu_can_kiem_tra ≤ 3 ý ngắn; ly_do_chon_phuong_phap ≤ 25 từ; ghi_chu_thay_doi ≤ 5 ý, mỗi ý ≤ 15 từ.
+- Ngắn KHÔNG có nghĩa là thiếu: mọi trường bắt buộc trong danh mục dưới đây vẫn phải có nội dung cụ thể, chấm được.
+
 DANH MỤC BẮT BUỘC ĐỂ ĐẠT (bộ kiểm tra tự động sẽ soát từng mục — thiếu mục nào sẽ bị trả lại):
 A. Khung mẫu (Bước 1)
   - Mục tiêu đủ: kiến thức, năng lực chung, năng lực đặc thù, phẩm chất; với tiết 4PP thêm TLIM và Trao quyền. Mỗi mục tiêu có id duy nhất (KT1, NLC1, NLDT1, PC1, TL1, GT1, TQ1) và viết đo lường được.
