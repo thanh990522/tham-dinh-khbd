@@ -100,18 +100,24 @@ function withOriginal(prompt, original) {
   return prompt.replace('{{BAN_GOC}}', () => `${cut}\n…(phần cuối quá dài đã được lược bớt)`);
 }
 
+// Thông báo cho người dùng theo mã lỗi của capability `sample` (kèm mã để dễ báo lại)
 export function errMsg(e) {
   const m = {
-    not_granted: 'Trang chưa được phép dùng Claude. Tải lại trang và chọn Cho phép khi được hỏi.',
-    sampling_disabled: 'Tài khoản hoặc tổ chức của bạn chưa bật Claude cho trang này.',
-    rate_limited: 'Đã chạm giới hạn sử dụng Claude của tài khoản. Thử lại sau ít phút.',
+    not_granted: 'Trang chưa được phép dùng Claude trên tài khoản của bạn (đã bấm "Không cho phép" hoặc tổ chức chưa cho phép). Tải lại trang, bấm Nâng cấp KHBD và chọn Cho phép; hoặc bấm "Mở cài đặt quyền của trang" bên dưới.',
+    sampling_disabled: 'Tài khoản hoặc tổ chức claude.ai của bạn không cho trang dùng Claude. Nếu dùng tài khoản trường/công ty: nhờ quản trị viên tổ chức bật tính năng này; hoặc đăng nhập tài khoản claude.ai cá nhân rồi mở lại link.',
+    capability_disabled: 'Chế độ xem hiện tại không chạy được Claude. Mở link bằng trình duyệt Chrome/Edge/Safari trên máy tính (không mở trong Zalo, Facebook, Messenger), đăng nhập claude.ai rồi thử lại.',
+    not_declared: 'Trang vừa được cập nhật. Tải lại trang rồi thử lại.',
+    capability_removed: 'Ứng dụng Claude đang dùng là bản cũ. Cập nhật ứng dụng, hoặc mở link trên trình duyệt web.',
+    rate_limited: 'Tài khoản claude.ai của bạn đã chạm giới hạn sử dụng (mỗi tiết cần 4–5 lượt Claude viết dài). Chờ đến khi hạn mức được làm mới hoặc nâng gói, rồi thử lại.',
     prompt_too_large: 'Tiết này quá dài cho một lần xử lý. Hãy tách file theo từng tiết.',
     invalid_json: 'Kết quả từ Claude bị cắt giữa chừng. Bấm nâng cấp lại.',
+    empty_completion: 'Claude không trả về nội dung. Bấm nâng cấp lại.',
     refused: 'Claude từ chối nội dung này. Kiểm tra lại nội dung file.',
-    session_expired: 'Phiên đăng nhập claude.ai đã hết hạn — hãy đăng nhập lại.',
+    session_expired: 'Phiên đăng nhập claude.ai đã hết hạn — hãy đăng nhập lại rồi tải lại trang.',
     upstream_error: 'Mất kết nối tạm thời tới Claude. Bấm nâng cấp lại.',
   };
-  return m[e?.code] || e?.message || 'Đã có lỗi không xác định.';
+  const text = m[e?.code] || e?.message || 'Đã có lỗi không xác định.';
+  return e?.code ? `${text} (mã lỗi: ${e.code})` : text;
 }
 
 async function ask(sample, prompt, { tier = 'complex', signal, onChars }) {

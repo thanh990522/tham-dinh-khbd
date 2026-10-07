@@ -33,7 +33,7 @@ const chosen = () => [...document.querySelectorAll('#lessons input:checked')].ma
 
 function refresh() {
   let hint = '';
-  if (!S.sample) hint = S.sample === null ? 'Claude chưa dùng được ở chế độ xem này — hãy mở trang trong claude.ai.' : 'Đang kết nối Claude…';
+  if (!S.sample) hint = S.sample === null ? 'Chưa kết nối được Claude ở chế độ xem này. Mở đúng link claude.ai/artifact/… bằng Chrome/Edge/Safari (không mở trong Zalo/Facebook), đăng nhập claude.ai rồi tải lại trang.' : 'Đang kết nối Claude…';
   else if (!S.parts.length) hint = 'Tải giáo án lên để bắt đầu.';
   else if (!chosen().length) hint = 'Chọn ít nhất một tiết.';
   else hint = `${chosen().length} tiết · khoảng ${chosen().length * 4}–${chosen().length * 8} phút`;
@@ -175,6 +175,7 @@ async function run() {
     p.className = 'err';
     p.textContent = error?.code === 'cancelled' ? 'Đã dừng. Bấm Nâng cấp KHBD để chạy lại.' : errMsg(error);
     box.appendChild(p);
+    if (error?.code === 'not_granted') offerPermissions(p);
   }
   S.busy = false;
   $('goRow').hidden = false;
@@ -195,7 +196,7 @@ function resultPanel(results, error) {
   el.innerHTML = `<div class="result-top">
       <div class="score"><b>${avg}</b><small>/100</small></div>
       <div class="verdict"><strong>${allPass ? 'KHBD đã đạt chuẩn thẩm định' : 'KHBD đã nâng cấp — còn vài điểm cần thầy cô xem lại'}</strong>
-        <span>${n} tiết · ${results.map((r) => `${r.score.xep_loai}`).join(', ')}${error ? ' · các tiết sau bị dừng giữa chừng' : ''}</span></div>
+        <span>${n} tiết · ${results.map((r) => `${r.score.xep_loai}`).join(', ')}${error ? ` · các tiết sau bị dừng: ${esc(error.code === 'cancelled' ? 'đã bấm Dừng' : errMsg(error))}` : ''}</span></div>
     </div>
     ${n === 1 ? breakdown(results[0]) : ''}
     <div class="go"><button class="btn primary" type="button" id="dl">Tải KHBD hoàn chỉnh (.docx)</button><button class="btn quiet" type="button" id="cp">Sao chép để dán vào Word</button></div>
