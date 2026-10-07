@@ -1,209 +1,217 @@
-<title>Trợ lý KHBD Việt Anh</title>
+<title>Nâng cấp KHBD Việt Anh</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,600&display=swap">
 <style>
-/* Bố cục: một cột công cụ như tập giáo án — mực xanh trên giấy, bút đỏ cho lỗi chặn duyệt */
+/* Bố cục: một cột giữa trang như tờ giáo án trên giấy ô ly; mực tím cho thao tác, bút đỏ cho điều cần sửa */
 :root {
-  --paper: #f6f7f9; --sheet: #ffffff; --ink: #1b2a3a; --muted: #5a6878; --rule: #dde3ea;
-  --accent: #1f5f8b; --accent-ink: #ffffff; --accent-soft: #e6eff6;
-  --good: #2f7a4a; --good-soft: #e5f3ea; --warn: #9a6200; --warn-soft: #fbf1df; --red: #b3261e; --red-soft: #fbe9e7;
+  --paper: #f6f4fa; --grid: rgba(91, 63, 166, .07); --sheet: #ffffff; --ink: #211c31; --muted: #6a6480; --rule: #e5e0ef;
+  --accent: #5b3fa6; --accent-ink: #ffffff; --accent-soft: #efeaf9; --accent-deep: #452d86;
+  --good: #2b7a4b; --good-soft: #e6f4ec; --red: #c0352c; --red-soft: #fcebea; --amber: #946100; --amber-soft: #fbf2df;
   --display: "Lora", Georgia, "Times New Roman", serif;
   --body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 14px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #12171d; --sheet: #1a212a; --ink: #e5eaf0; --muted: #9aa7b6; --rule: #2c3643;
-    --accent: #79b4e0; --accent-ink: #0c1722; --accent-soft: #1d2d3c;
-    --good: #7fcf9c; --good-soft: #1b3125; --warn: #f0c070; --warn-soft: #362b17; --red: #ff8f86; --red-soft: #3a1f1d;
+    --paper: #141220; --grid: rgba(180, 160, 255, .05); --sheet: #1d1a2c; --ink: #ebe8f5; --muted: #a39dbb; --rule: #312c45;
+    --accent: #a993f0; --accent-ink: #160f2b; --accent-soft: #2a2343; --accent-deep: #c3b4f7;
+    --good: #82d0a0; --good-soft: #1b3326; --red: #ff9a90; --red-soft: #3b1f22; --amber: #f2c46e; --amber-soft: #382c16;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #12171d; --sheet: #1a212a; --ink: #e5eaf0; --muted: #9aa7b6; --rule: #2c3643;
-  --accent: #79b4e0; --accent-ink: #0c1722; --accent-soft: #1d2d3c;
-  --good: #7fcf9c; --good-soft: #1b3125; --warn: #f0c070; --warn-soft: #362b17; --red: #ff8f86; --red-soft: #3a1f1d;
+  --paper: #141220; --grid: rgba(180, 160, 255, .05); --sheet: #1d1a2c; --ink: #ebe8f5; --muted: #a39dbb; --rule: #312c45;
+  --accent: #a993f0; --accent-ink: #160f2b; --accent-soft: #2a2343; --accent-deep: #c3b4f7;
+  --good: #82d0a0; --good-soft: #1b3326; --red: #ff9a90; --red-soft: #3b1f22; --amber: #f2c46e; --amber-soft: #382c16;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px; }
-header { display: grid; gap: 4px; }
-.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
-h1 { font: 700 28px/1.2 var(--display); margin: 0; text-wrap: balance; }
-h2 { font: 700 18px/1.3 var(--display); margin: 0 0 10px; }
-h3 { font-size: 15px; margin: 0; }
-.sub { color: var(--muted); margin: 0; max-width: 70ch; }
-.status { font-size: 13px; padding: 6px 10px; border-radius: 8px; background: var(--accent-soft); justify-self: start; }
-.status.good { color: var(--good); background: var(--good-soft); } .status.bad { color: var(--red); background: var(--red-soft); }
-section.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; min-width: 0; }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.tab { font: inherit; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer; }
-.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.help, .muted { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
-.drop { display: grid; gap: 4px; place-items: center; text-align: center; border: 2px dashed var(--rule); border-radius: 12px; padding: 22px 12px; cursor: pointer; }
-.drop.over { border-color: var(--accent); background: var(--accent-soft); }
-.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
-.lessons { display: grid; gap: 8px; margin-top: 12px; }
-.lesson { border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; }
-.lesson-h { display: flex; gap: 8px; align-items: center; font-weight: 600; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
-.chip.ok { background: var(--good-soft); color: var(--good); } .chip.p1 { background: var(--red-soft); color: var(--red); }
-.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); align-content: start; }
-.span2 { grid-column: span 2; } .all { grid-column: 1 / -1; }
-.check { display: flex !important; align-items: center; gap: 8px; color: var(--ink) !important; font-size: 14px !important; }
-input, select, textarea { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
-input[type="checkbox"] { width: auto; accent-color: var(--accent); }
-input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
-button.primary, button.ghost, button.stop { font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
-button.primary { background: var(--accent); color: var(--accent-ink); }
-button.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
-button.stop { background: var(--red-soft); color: var(--red); }
-button:disabled { opacity: .5; cursor: not-allowed; }
-.log { margin: 0; padding-left: 18px; max-height: 260px; overflow: auto; font-size: 14px; display: grid; gap: 2px; }
-.log li.ok { color: var(--good); } .log li.err { color: var(--red); } .log li.live { color: var(--muted); list-style: none; }
-.results { display: grid; gap: 12px; margin-top: 12px; }
-.res { border: 1px solid var(--rule); border-radius: 12px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
-.res-h { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
-.pill { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
-.pill.good { background: var(--good-soft); color: var(--good); } .pill.warn { background: var(--warn-soft); color: var(--warn); } .pill.bad { background: var(--red-soft); color: var(--red); }
-.score { font-variant-numeric: tabular-nums; } .score b { font: 700 36px/1 var(--display); } .score span { color: var(--muted); }
-.verdict { margin: 0; font-weight: 600; } .verdict.good { color: var(--good); } .verdict.bad { color: var(--red); }
-.parts { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 0; }
-.parts div { background: var(--paper); border-radius: 8px; padding: 6px 8px; }
-.parts dt { font-size: 11px; color: var(--muted); } .parts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-.dl { display: flex; flex-wrap: wrap; gap: 10px; }
-details > summary { cursor: pointer; font-weight: 600; }
-.tq { display: grid; gap: 6px; padding-left: 22px; margin: 6px 0 0; }
-.warn { color: var(--warn); font-size: 13px; }
-table.crit { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
-.crit th, .crit td { border-top: 1px solid var(--rule); padding: 6px 8px; text-align: left; vertical-align: top; }
-.crit td:nth-child(2) { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.tablewrap { overflow-x: auto; }
-footer { color: var(--muted); font-size: 12px; }
-@media (max-width: 720px) {
-  .grid { grid-template-columns: 1fr 1fr; } .span2 { grid-column: 1 / -1; }
-  .parts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  h1 { font-size: 23px; }
+[hidden] { display: none !important; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink); font: 15px/1.6 var(--body);
 }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 36px 48px; display: grid; gap: 22px; }
+
+header { display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(28px, 5vw, 38px)/1.15 var(--display); margin: 0; text-wrap: balance; }
+h1 em { font-style: italic; color: var(--accent); }
+.lead { margin: 0; color: var(--muted); max-width: 60ch; font-size: 16px; }
+.standards { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.standards span { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--sheet); border: 1px solid var(--rule); color: var(--muted); }
+
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(33, 28, 49, .04), 0 8px 28px rgba(33, 28, 49, .06); }
+.step { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding: 22px; }
+.step + .step { border-top: 1px dashed var(--rule); }
+.num { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 700 16px var(--display); color: var(--accent); border: 1.5px solid var(--accent); }
+.step.done .num { background: var(--accent); color: var(--accent-ink); }
+.step.idle { opacity: .55; }
+.step h2 { font: 600 17px/1.3 var(--body); margin: 6px 0 12px; }
+.step-body { min-width: 0; display: grid; gap: 12px; }
+
+.drop { position: relative; display: grid; gap: 6px; place-items: center; text-align: center; padding: 30px 16px; border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, var(--rule)); border-radius: 12px; background: var(--accent-soft); cursor: pointer; transition: border-color .15s, background .15s; }
+.drop:hover, .drop.over { border-color: var(--accent); }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.drop:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+.drop svg { width: 34px; height: 34px; color: var(--accent); }
+.drop b { font-weight: 600; }
+.drop small { color: var(--muted); font-size: 13px; }
+.file { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: 10px; background: var(--paper); font-size: 14px; }
+.file b { overflow-wrap: anywhere; }
+.err { color: var(--red); font-size: 14px; margin: 0; }
+
+.lessons { display: grid; gap: 8px; }
+.lesson { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: start; padding: 11px 13px; border: 1px solid var(--rule); border-radius: 10px; cursor: pointer; }
+.lesson:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.lesson input { margin-top: 4px; accent-color: var(--accent); width: 16px; height: 16px; }
+.lesson .t { font-weight: 600; overflow-wrap: anywhere; }
+.lesson .m { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--amber-soft); color: var(--amber); }
+.tag.red { background: var(--red-soft); color: var(--red); } .tag.ok { background: var(--good-soft); color: var(--good); }
+.selall { justify-self: start; font: inherit; font-size: 13px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+details.opts { border: 1px solid var(--rule); border-radius: 10px; }
+details.opts > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; font-size: 14px; color: var(--muted); list-style: none; display: flex; justify-content: space-between; }
+details.opts > summary::after { content: "+"; font-weight: 600; color: var(--accent); }
+details.opts[open] > summary::after { content: "–"; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 4px 14px 14px; }
+.grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.grid .all { grid-column: 1 / -1; }
+.check { display: flex !important; align-items: center; gap: 8px; color: var(--ink) !important; font-size: 14px !important; }
+input[type="text"], select, textarea { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
+input[type="checkbox"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.go { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.btn { font: inherit; font-weight: 600; font-size: 15px; border-radius: 11px; padding: 12px 20px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { background: var(--accent-deep); }
+.btn.quiet { background: transparent; color: var(--muted); border-color: var(--rule); padding: 10px 16px; font-size: 14px; justify-self: start; }
+.btn.quiet:hover:not(:disabled) { color: var(--ink); border-color: var(--muted); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.hint { font-size: 13px; color: var(--muted); }
+
+.run { display: grid; gap: 14px; }
+.job { display: grid; gap: 8px; }
+.job-h { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; font-weight: 600; }
+.job-h span:last-child { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar { height: 6px; border-radius: 99px; background: var(--accent-soft); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: inherit; transition: width .4s ease; }
+.stages { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+.stages li::before { content: "○"; margin-right: 5px; }
+.stages li.now { color: var(--accent); font-weight: 600; } .stages li.now::before { content: "◐"; }
+.stages li.ok { color: var(--good); } .stages li.ok::before { content: "●"; }
+
+.result { display: grid; gap: 14px; padding: 18px; border-radius: 12px; background: var(--good-soft); }
+.result.warn { background: var(--amber-soft); }
+.result-top { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.score { display: grid; place-items: center; width: 82px; height: 82px; border-radius: 50%; background: var(--sheet); border: 3px solid var(--good); font-variant-numeric: tabular-nums; }
+.result.warn .score { border-color: var(--amber); }
+.score b { font: 700 28px/1 var(--display); } .score small { font-size: 11px; color: var(--muted); margin-top: -10px; }
+.verdict { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.verdict strong { font-size: 16px; }
+.verdict span { font-size: 14px; color: var(--muted); }
+.rows { display: grid; gap: 4px; font-size: 14px; }
+.rows div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); padding-bottom: 4px; }
+.rows dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rows dt { color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.note.red { color: var(--red); }
+details.left summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+details.left ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 4px; }
+
+footer { font-size: 12px; color: var(--muted); text-align: center; text-wrap: balance; }
+@media (max-width: 560px) {
+  .step { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; }
+  .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .bar i, .drop { transition: none; } }
 </style>
 
 <div class="wrap">
   <header>
     <div class="eyebrow">Trường Việt Anh · Vui Vẻ &amp; Thực Dụng</div>
-    <h1>Trợ lý Kế hoạch bài dạy</h1>
-    <p class="sub">Tải giáo án lên, nhận lại file Word KHBD hoàn chỉnh theo CV5512, 4 phương pháp Việt Anh, Active Learning, TLIM &amp; 5 giá trị — kèm báo cáo thẩm định /100 với mã lỗi P1/P2/P3.</p>
-    <div id="status" class="status">Đang kết nối Claude…</div>
+    <h1>Nâng cấp <em>Kế hoạch bài dạy</em></h1>
+    <p class="lead">Tải giáo án hiện có lên — nhận lại file Word KHBD hoàn chỉnh, giữ nguyên ngữ liệu, bài tập và hình ảnh của thầy cô.</p>
+    <div class="standards" aria-label="Chuẩn áp dụng">
+      <span>CV5512 · Phụ lục IV</span><span>4 phương pháp Việt Anh</span><span>Active Learning</span><span>TLIM &amp; 5 giá trị</span><span>Tự chấm ≥ 88/100</span>
+    </div>
   </header>
 
-  <section class="sheet">
-    <div class="tabs" role="tablist">
-      <button class="tab" data-mode="nang_cap" role="tab" type="button">Nâng cấp từ file giáo án</button>
-      <button class="tab" data-mode="soan_moi" role="tab" type="button">Soạn mới</button>
-      <button class="tab" data-mode="tham_dinh" role="tab" type="button">Chỉ thẩm định bản gốc</button>
-    </div>
-    <p id="modeHelp" class="help"></p>
+  <main class="sheet">
+    <section class="step" id="s1">
+      <div class="num">1</div>
+      <div class="step-body">
+        <h2>Tải giáo án lên</h2>
+        <label class="drop" id="drop">
+          <input id="file" type="file" accept=".docx,.txt" aria-label="Chọn file giáo án">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 17v-6"/><path d="m9.5 13.5 2.5-2.5 2.5 2.5"/></svg>
+          <b>Kéo thả file .docx vào đây</b>
+          <small>hoặc bấm để chọn file · một file có thể gồm nhiều tiết</small>
+        </label>
+        <div class="file" id="fileRow" hidden><b id="fileName"></b><span class="hint" id="fileInfo"></span></div>
+        <p class="err" id="fileErr" hidden></p>
+      </div>
+    </section>
 
-    <div id="uploadBox" style="margin-top:14px">
-      <label class="drop" id="drop">
-        <input id="file" type="file" accept=".docx,.txt,.md,.json">
-        <span>Kéo thả hoặc bấm để chọn file <b>.docx</b> (hoặc .txt, .json đã xuất)</span>
-        <span id="fileName" class="muted"></span>
-      </label>
-      <div id="lessons" class="lessons"></div>
-    </div>
-  </section>
+    <section class="step idle" id="s2">
+      <div class="num">2</div>
+      <div class="step-body">
+        <h2>Chọn tiết cần nâng cấp</h2>
+        <div class="lessons" id="lessons"><p class="hint">Danh sách tiết sẽ hiện ở đây sau khi tải file.</p></div>
+        <button class="selall" id="selAll" type="button" hidden>Chọn / bỏ chọn tất cả</button>
+        <details class="opts">
+          <summary>Tuỳ chọn (không bắt buộc)</summary>
+          <div class="grid">
+            <label class="all">Phương pháp
+              <select id="phuong_phap">
+                <option value="AUTO">Tự chọn phương pháp phù hợp nhất với bài</option>
+                <option value="THUONG">Tiết thông thường (CV5512)</option>
+                <option value="CT">Critical Thinking – PRAAD</option>
+                <option value="LA">LikeAbility – phân cấp</option>
+                <option value="CA">CrossAbility – chọn chủ đề, dạy lại</option>
+                <option value="SD">Same / Different</option>
+              </select>
+            </label>
+            <label class="all">Ngôn ngữ trình bày
+              <select id="ngon_ngu">
+                <option value="Giữ như bản gốc (môn ngoại ngữ: giữ ngữ liệu, câu hỏi, đáp án bằng ngoại ngữ)">Giữ như bản gốc</option>
+                <option>Tiếng Việt</option>
+                <option>Tiếng Việt cho phần tổ chức; tiếng Anh cho ngữ liệu, câu hỏi, đáp án</option>
+                <option>English</option>
+              </select>
+            </label>
+            <label>Giáo viên <input type="text" id="giao_vien"></label>
+            <label>Tổ chuyên môn <input type="text" id="to_chuyen_mon"></label>
+            <label>Môn học <input type="text" id="mon_hoc" placeholder="Tự nhận từ file"></label>
+            <label>Lớp <input type="text" id="lop" placeholder="Tự nhận từ file"></label>
+            <label class="check all"><input type="checkbox" id="su_dung_ai"> Tiết học có sử dụng AI</label>
+            <label class="all">Ghi chú cho Claude
+              <textarea id="yeu_cau_them" rows="2" placeholder="vd: lớp nhiều HS yếu; muốn dùng Thói quen 6 – Hợp lực; không có máy chiếu…"></textarea>
+            </label>
+          </div>
+        </details>
+      </div>
+    </section>
 
-  <section class="sheet">
-    <h2>Thông tin bài dạy</h2>
-    <div class="grid">
-      <label>Môn học <input id="mon_hoc" placeholder="vd: Tiếng Anh"></label>
-      <label>Lớp <input id="lop" placeholder="vd: 7"></label>
-      <label class="span2">Tên bài / chủ đề <input id="ten_bai" placeholder="Để trống: lấy từ file"></label>
-      <label>Bộ sách <input id="bo_sach" value="Kết nối tri thức với cuộc sống"></label>
-      <label>Số tiết <input id="so_tiet" type="number" min="1" max="6" value="1"></label>
-      <label>Tiết PPCT <input id="tiet_ppct"></label>
-      <label>Tuần <input id="tuan"></label>
-      <label>Tổ chuyên môn <input id="to_chuyen_mon"></label>
-      <label>Giáo viên <input id="giao_vien"></label>
-      <label class="span2">Phương pháp
-        <select id="phuong_phap">
-          <option value="AUTO">Để Claude chọn phương pháp phù hợp nhất</option>
-          <option value="THUONG">Tiết thông thường (CV5512 · 12 tiêu chí CV5555)</option>
-          <option value="CT">Critical Thinking – PRAAD</option>
-          <option value="LA">LikeAbility – phân cấp (hợp bài ôn tập)</option>
-          <option value="CA">CrossAbility – chọn chủ đề, dạy lại</option>
-          <option value="SD">Same / Different – chọn phương án, so sánh</option>
-        </select>
-      </label>
-      <label class="span2">Ngôn ngữ nội dung
-        <select id="ngon_ngu">
-          <option>Tiếng Việt</option>
-          <option>Tiếng Việt cho phần tổ chức; tiếng Anh cho ngữ liệu, câu hỏi, đáp án</option>
-          <option>English</option>
-        </select>
-      </label>
-      <label class="check span2"><input id="su_dung_ai" type="checkbox"> Tiết học có sử dụng AI</label>
-      <label class="all">Yêu cầu bổ sung (không bắt buộc)
-        <textarea id="yeu_cau_them" rows="2" placeholder="vd: lớp nhiều HS yếu; muốn dùng Thói quen 6 – Hợp lực; phòng không có máy chiếu…"></textarea>
-      </label>
-    </div>
-    <div class="actions">
-      <button id="run" class="primary" type="button" disabled>Tạo KHBD hoàn chỉnh</button>
-      <button id="stop" class="stop" type="button" hidden>Dừng</button>
-      <button id="showSample" class="ghost" type="button">Xem bản mẫu TA7</button>
-      <span id="runHint" class="muted"></span>
-    </div>
-  </section>
-
-  <section class="sheet" id="progress" hidden>
-    <h2>Tiến trình &amp; kết quả</h2>
-    <ol id="log" class="log"></ol>
-    <div id="results" class="results"></div>
-  </section>
-
-  <section class="sheet">
-    <details>
-      <summary>Cài đặt của tổ (6 tiêu chí Trao quyền, điểm mục tiêu)</summary>
-      <div class="grid" style="margin-top:12px">
-        <label>Tổ chuyên môn mặc định <input id="cfgTo"></label>
-        <label>Điểm mục tiêu tự sửa <input id="cfgTarget" type="number" min="70" max="100"></label>
-        <label>Số vòng tự sửa tối đa <input id="cfgRounds" type="number" min="0" max="3"></label>
-        <div class="all">
-          <div class="muted" style="margin:0"><b>6 tiêu chí Trao quyền</b> dùng để chấm "đạt ≥ 4/6" — <span id="tqState"></span></div>
-          <ol id="tq" class="tq"></ol>
+    <section class="step idle" id="s3">
+      <div class="num">3</div>
+      <div class="step-body">
+        <h2>Nhận KHBD hoàn chỉnh</h2>
+        <div class="go" id="goRow">
+          <button class="btn primary" id="run" type="button" disabled>Nâng cấp KHBD</button>
+          <span class="hint" id="runHint">Đang kết nối Claude…</span>
         </div>
+        <div class="run" id="runBox" hidden></div>
       </div>
-      <div class="actions"><button id="saveCfg" class="ghost" type="button">Lưu cài đặt</button><span id="cfgMsg" class="muted"></span></div>
-      <p class="muted">Cài đặt lưu trên trình duyệt của máy này.</p>
-    </details>
-  </section>
+    </section>
+  </main>
 
-  <section class="sheet">
-    <details>
-      <summary>Hệ thống kiểm tra và tự sửa những gì?</summary>
-      <p class="muted">Mỗi tiết: Claude soạn (2 phần) → bộ kiểm tra theo quy tắc → Claude chấm chuyên môn → sửa đúng phần bị lỗi, lặp đến khi đạt điểm mục tiêu và không còn lỗi P1/P2.</p>
-      <div class="tablewrap">
-        <table class="crit">
-          <tr><th>Thành phần</th><th>Điểm</th><th>Kiểm tra</th></tr>
-          <tr><td>Bước 1 – Khung mẫu: mục tiêu 5 phần (4PP), thiết bị, a–d mỗi hoạt động, Chiêm nghiệm + Củng cố, bộ câu hỏi định hướng, rubric, yếu tố đặc thù phương pháp</td><td>15</td><td>Quy tắc</td></tr>
-          <tr><td>Bước 2/3 – Yêu cầu cần đạt</td><td>10</td><td>Claude chấm</td></tr>
-          <tr><td>Bước 4 – Thời gian = 45 × số tiết</td><td>cảnh báo</td><td>Quy tắc</td></tr>
-          <tr><td>Bước 5 – Ma trận mục tiêu ↔ hoạt động</td><td>20</td><td>Quy tắc</td></tr>
-          <tr><td>Bước 6 – 4PPM hoặc CV5555 (phần chờ dự giờ loại khỏi mẫu số)</td><td>40</td><td>Claude + quy tắc</td></tr>
-          <tr><td>Bước 7 – Active Learning · 5 giá trị &amp; 7 thói quen · Ứng dụng AI</td><td>15</td><td>Quy tắc</td></tr>
-        </table>
-      </div>
-      <p class="muted">Bản web này không tra cứu Internet: chi tiết SGK hoặc yêu cầu cần đạt chưa chắc chắn được đánh dấu đỏ "GV kiểm tra lại theo SGK" trong file Word.</p>
-    </details>
-  </section>
-
-  <footer>Kết quả do AI hỗ trợ — giáo viên và TTCM rà soát lần cuối trước khi lên lớp. Mỗi lần chạy dùng lượt Claude trong tài khoản của người bấm.</footer>
+  <footer>Claude chạy trên tài khoản claude.ai của người dùng · Chi tiết SGK chưa chắc chắn được đánh dấu đỏ trong file để giáo viên kiểm tra · Giáo viên rà soát lần cuối trước khi lên lớp.</footer>
 </div>
 
 <script src="docx.iife.js"></script>

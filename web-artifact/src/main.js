@@ -1,261 +1,238 @@
-import { readFile, preAudit, runLesson, toDocx, makeConfig, errMsg } from './engine.js';
-import sampleKHBD from '../../samples/TA7_Unit2_Lesson1.khbd.json';
+import { readFile, preAudit, upgradeLesson, buildDocx, errMsg } from './engine.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const store = {
-  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* bỏ qua */ } },
-};
-const S = { mode: 'nang_cap', file: null, parts: [], images: [], sample: null, downloads: null, busy: false, ctl: null };
+const S = { parts: [], images: [], fileName: '', sample: null, downloads: null, busy: false, ctl: null, blob: null };
 
-const MODE_HELP = {
-  nang_cap: 'Tải giáo án hiện có. Claude giữ ngữ liệu, bài tập, đáp án và hình ảnh của thầy/cô, tái cấu trúc theo khung và bổ sung phần thiếu, rồi tự chấm – tự sửa đến khi đạt.',
-  soan_moi: 'Không cần file: nhập môn, lớp, tên bài — Claude soạn KHBD mới đạt chuẩn.',
-  tham_dinh: 'Chấm bản gốc đúng như giáo viên nộp (không sửa) theo bảng điểm /100 và mã lỗi P1/P2/P3.',
-};
+// Các giai đoạn của một tiết: [khoá, nhãn, % bắt đầu, % kết thúc, số ký tự dự kiến]
+const STAGES = [
+  ['soan1', 'Mục tiêu & rubric', 0, 38, 18000],
+  ['soan2', 'Tiến trình dạy học', 38, 76, 26000],
+  ['cham', 'Chấm theo tiêu chí', 76, 90, 4000],
+  ['sua', 'Tự sửa', 90, 97, 16000],
+];
 
-function settings() {
-  return store.get('khbd_settings', { tieu_chi_trao_quyen: null, diem_muc_tieu: 88, so_vong: 2, to_chuyen_mon: '' });
-}
-function config() { return makeConfig(settings()); }
-
-function log(msg, cls = '') {
-  const box = $('log');
-  if (!cls) {
-    let live = box.querySelector('li.live');
-    if (!live) { live = document.createElement('li'); live.className = 'live'; box.appendChild(live); }
-    live.textContent = msg;
-  } else {
-    box.querySelector('li.live')?.remove();
-    const li = document.createElement('li');
-    li.className = cls;
-    li.textContent = msg;
-    box.appendChild(li);
-  }
-  box.scrollTop = box.scrollHeight;
+function setStep(n) {
+  ['s1', 's2', 's3'].forEach((id, i) => {
+    $(id).classList.toggle('done', i + 1 < n);
+    $(id).classList.toggle('idle', i + 1 > n);
+  });
 }
 
-// ───── chế độ, form ─────
-function setMode(m) {
-  S.mode = m;
-  document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.mode === m)));
-  $('modeHelp').textContent = MODE_HELP[m];
-  $('uploadBox').hidden = m === 'soan_moi';
-  $('run').textContent = m === 'tham_dinh' ? 'Thẩm định bản gốc' : m === 'soan_moi' ? 'Soạn KHBD mới' : 'Tạo KHBD hoàn chỉnh';
-  refresh();
-}
-
-function chosen() { return [...document.querySelectorAll('#lessons input:checked')].map((c) => Number(c.value)); }
+const chosen = () => [...document.querySelectorAll('#lessons input:checked')].map((c) => Number(c.value));
 
 function refresh() {
   let hint = '';
-  let ok = !S.busy;
-  if (!S.sample) { ok = false; hint = 'Claude chưa sẵn sàng ở chế độ xem này — mở trang trong claude.ai.'; }
-  else if (S.mode === 'soan_moi') {
-    if (!$('mon_hoc').value.trim() || !$('ten_bai').value.trim()) { ok = false; hint = 'Nhập Môn học và Tên bài.'; }
-  } else if (!S.parts.length) { ok = false; hint = 'Tải giáo án lên trước.'; }
-  else if (!chosen().length) { ok = false; hint = 'Chọn ít nhất 1 tiết.'; }
-  $('run').disabled = !ok;
-  $('stop').hidden = !S.busy;
+  if (!S.sample) hint = S.sample === null ? 'Claude chưa dùng được ở chế độ xem này — hãy mở trang trong claude.ai.' : 'Đang kết nối Claude…';
+  else if (!S.parts.length) hint = 'Tải giáo án lên để bắt đầu.';
+  else if (!chosen().length) hint = 'Chọn ít nhất một tiết.';
+  else hint = `${chosen().length} tiết · khoảng ${chosen().length * 4}–${chosen().length * 8} phút`;
+  $('run').disabled = S.busy || !S.sample || !S.parts.length || !chosen().length;
   $('runHint').textContent = S.busy ? '' : hint;
+  if (S.parts.length && !S.busy) setStep(S.blob ? 4 : chosen().length ? 3 : 2);
 }
 
-function opts() {
-  const v = (id) => $(id).value.trim();
-  return {
-    truong: 'Trường Việt Anh', to_chuyen_mon: v('to_chuyen_mon') || settings().to_chuyen_mon, giao_vien: v('giao_vien'), mon_hoc: v('mon_hoc'), lop: v('lop'),
-    ten_bai: v('ten_bai'), bo_sach: v('bo_sach'), so_tiet: Number(v('so_tiet')) || 1, tiet_ppct: v('tiet_ppct'), tuan: v('tuan'),
-    phuong_phap: v('phuong_phap'), su_dung_ai: $('su_dung_ai').checked, ngon_ngu: v('ngon_ngu'), yeu_cau_them: v('yeu_cau_them'),
-  };
-}
-
-// ───── tải file ─────
+// ───── Bước 1: đọc file ─────
 async function onFile(file) {
-  $('fileName').textContent = `${file.name} — đang đọc…`;
+  $('fileErr').hidden = true;
+  $('fileRow').hidden = false;
+  $('fileName').textContent = file.name;
+  $('fileInfo').textContent = 'đang đọc…';
   try {
     const r = await readFile(file);
     S.parts = r.parts;
     S.images = r.images;
-    $('fileName').textContent = `${file.name} — ${r.parts.length} tiết/bài${r.images.length ? `, ${r.images.length} hình` : ''}`;
+    S.fileName = file.name.replace(/\.[^.]+$/, '');
+    $('fileInfo').textContent = `${r.parts.length} tiết${r.images.length ? ` · ${r.images.length} hình` : ''}`;
     renderLessons();
   } catch (e) {
     S.parts = [];
-    $('fileName').textContent = e.message;
-    $('lessons').innerHTML = '';
+    $('fileRow').hidden = true;
+    $('fileErr').textContent = e.message;
+    $('fileErr').hidden = false;
+    $('lessons').innerHTML = '<p class="hint">Danh sách tiết sẽ hiện ở đây sau khi tải file.</p>';
+    setStep(1);
   }
+  $('runBox').hidden = true;
+  $('runBox').innerHTML = '';
+  S.blob = null;
+  $('run').textContent = 'Nâng cấp KHBD';
+  $('run').className = 'btn primary';
   refresh();
 }
 
 function renderLessons() {
   const box = $('lessons');
   box.innerHTML = '';
-  const so = settings();
   S.parts.forEach((p, i) => {
-    const pre = p.text ? preAudit(p.text, 45 * (Number($('so_tiet').value) || 1)) : null;
-    const thieu = pre ? pre.items.filter((x) => !x.co) : [];
-    const row = document.createElement('div');
+    const a = preAudit(p.text, 45);
+    const thieu = a.items.filter((x) => !x.co);
+    const p1 = thieu.filter((x) => x.p1).length;
+    const row = document.createElement('label');
     row.className = 'lesson';
-    row.innerHTML = `<label class="lesson-h"><input type="checkbox" value="${p.so}" ${i === 0 ? 'checked' : ''}> <span>${esc(p.tieu_de)}</span></label>
-      <div class="chips">${pre ? `<span class="chip ok">đã có ${pre.items.length - thieu.length}/${pre.items.length} mục</span>${thieu.map((x) => `<span class="chip ${x.p1 ? 'p1' : ''}">thiếu: ${esc(x.ten)}</span>`).join('')}<span class="chip ${pre.thoi_gian.khop ? 'ok' : ''}">${pre.thoi_gian.tong}/${pre.thoi_gian.chuan} phút</span>` : '<span class="chip ok">KHBD dạng JSON</span>'}</div>`;
+    row.innerHTML = `<input type="checkbox" value="${p.so}" ${i === 0 || S.parts.length <= 2 ? 'checked' : ''}>
+      <span class="t">${esc(p.tieu_de)}</span>
+      <span class="m">${thieu.length ? `<span class="tag">bản gốc thiếu ${thieu.length}/${a.items.length} thành phần</span>` : '<span class="tag ok">đủ thành phần chính</span>'}${p1 ? '<span class="tag red">thiếu Chiêm nghiệm</span>' : ''}${a.thoi_gian.tong ? `<span class="tag ${a.thoi_gian.khop ? 'ok' : ''}">${a.thoi_gian.tong}/45 phút</span>` : ''}</span>`;
     box.appendChild(row);
   });
-  void so;
   box.querySelectorAll('input').forEach((c) => c.addEventListener('change', refresh));
+  $('selAll').hidden = S.parts.length < 3;
 }
 
-// ───── chạy ─────
+// ───── Bước 3: nâng cấp ─────
+function opts() {
+  const v = (id) => $(id).value.trim();
+  return {
+    truong: 'Trường Việt Anh', to_chuyen_mon: v('to_chuyen_mon'), giao_vien: v('giao_vien'), mon_hoc: v('mon_hoc'), lop: v('lop'),
+    ten_bai: '', bo_sach: 'Kết nối tri thức với cuộc sống', so_tiet: 1, phuong_phap: v('phuong_phap'),
+    su_dung_ai: $('su_dung_ai').checked, ngon_ngu: v('ngon_ngu'), yeu_cau_them: v('yeu_cau_them'),
+  };
+}
+
+function jobRow(title) {
+  const el = document.createElement('div');
+  el.className = 'job';
+  el.innerHTML = `<div class="job-h"><span>${esc(title)}</span><span class="pct">Đang chờ</span></div>
+    <div class="bar"><i></i></div>
+    <ul class="stages">${STAGES.map(([k, label]) => `<li data-k="${k}">${label}</li>`).join('')}</ul>`;
+  return {
+    el,
+    stage(key, chars = 0) {
+      const idx = STAGES.findIndex((s) => s[0] === key);
+      const [, , from, to, expect] = STAGES[idx];
+      const pct = Math.round(from + (to - from) * Math.min(0.95, chars / expect));
+      el.querySelector('.bar i').style.width = `${pct}%`;
+      el.querySelector('.pct').textContent = chars ? `${pct}%` : 'Claude đang suy nghĩ…';
+      el.querySelectorAll('.stages li').forEach((li, i) => {
+        li.className = i < idx ? 'ok' : i === idx ? 'now' : '';
+      });
+    },
+    finish(text, ok = true) {
+      el.querySelector('.bar i').style.width = '100%';
+      el.querySelector('.pct').textContent = text;
+      el.querySelectorAll('.stages li').forEach((li) => { li.className = ok ? 'ok' : ''; });
+    },
+  };
+}
+
 async function run() {
+  const parts = S.parts.filter((p) => chosen().includes(p.so));
   S.busy = true;
   S.ctl = new AbortController();
+  S.blob = null;
   refresh();
-  $('log').innerHTML = '';
-  $('results').innerHTML = '';
-  $('progress').hidden = false;
-  const cfg = config();
-  const o = opts();
-  const mode = S.mode === 'soan_moi' ? 'soan_moi' : S.mode;
-  const parts = S.mode === 'soan_moi' ? [{ so: 1, tieu_de: o.ten_bai, text: '' }] : S.parts.filter((p) => chosen().includes(p.so));
-  const results = [];
-  try {
-    for (const [i, part] of parts.entries()) {
-      const nhan = parts.length > 1 ? `[${i + 1}/${parts.length}] ${part.tieu_de}` : part.tieu_de;
-      log(`${nhan}: bắt đầu (mỗi tiết thường 3–8 phút).`, 'step');
-      const r = await runLesson({
-        sample: S.sample, config: cfg, opts: { ...o, ten_bai: parts.length > 1 ? '' : o.ten_bai || part.tieu_de }, part,
-        mode: mode === 'soan_moi' ? 'soan_moi' : mode === 'tham_dinh' ? 'trich_xuat' : 'nang_cap',
-        signal: S.ctl.signal, log: (m, c) => log(`${nhan}: ${m}`, c),
-      });
-      results.push(r);
-    }
-    log('Đang tạo file Word…', 'step');
-    const files = await toDocx(results, S.images, cfg, S.mode === 'tham_dinh' ? 'tham_dinh' : 'nang_cap');
-    showResults(results, files);
-    log('Xong.', 'ok');
-  } catch (e) {
-    log(e.code === 'cancelled' ? 'Đã dừng.' : `Lỗi: ${e.message || errMsg(e)}`, 'err');
-    if (results.length) {
-      const files = await toDocx(results, S.images, cfg, S.mode === 'tham_dinh' ? 'tham_dinh' : 'nang_cap');
-      showResults(results, files);
-    }
-  } finally {
-    S.busy = false;
-    refresh();
-  }
-}
-
-function showResults(results, files) {
-  const box = $('results');
+  const box = $('runBox');
+  box.hidden = false;
   box.innerHTML = '';
-  for (const r of results) {
-    const s = r.score;
-    const good = !s.co_p1 && s.diem_100 >= 70 && s.day_du;
-    const card = document.createElement('article');
-    card.className = 'res';
-    const b = r.validation.diem;
-    card.innerHTML = `<div class="res-h"><h3>${esc(r.khbd.meta.ten_bai || r.part.tieu_de)}</h3><span class="pill ${good ? 'good' : s.co_p1 ? 'bad' : 'warn'}">${esc(s.xep_loai)}${s.day_du ? '' : ' (tham khảo)'}</span></div>
-      <div class="score"><b>${s.diem_100}</b><span>/100</span></div>
-      <p class="verdict ${good ? 'good' : 'bad'}">${esc(s.ket_luan)}</p>
-      <dl class="parts">
-        <div><dt>Khung mẫu</dt><dd>${s.buoc1}/15</dd></div>
-        <div><dt>Yêu cầu cần đạt</dt><dd>${s.buoc23 ?? '—'}/10</dd></div>
-        <div><dt>Nhất quán</dt><dd>${s.buoc5}/20</dd></div>
-        <div><dt>Chuyên môn</dt><dd>${s.buoc6 ? s.buoc6.diem : '—'}/40</dd></div>
-        <div><dt>Đặc thù VA</dt><dd>${s.buoc7}/15</dd></div>
-        <div><dt>HS hoạt động</dt><dd>${b.buoc7.d1.ti_le_hs}%</dd></div>
-      </dl>
-      ${r.history.length > 1 ? `<p class="muted">Qua các vòng tự sửa: ${r.history.map((h) => h.diem_100).join(' → ')}</p>` : ''}
-      ${r.validation.issues.length ? `<p class="muted">Còn ${r.validation.issues.length} vấn đề theo quy tắc — xem báo cáo.</p>` : ''}`;
-    box.appendChild(card);
+  $('goRow').hidden = true;
+  const stop = document.createElement('button');
+  stop.className = 'btn quiet';
+  stop.type = 'button';
+  stop.textContent = 'Dừng';
+  stop.addEventListener('click', () => S.ctl.abort());
+  const rows = parts.map((p) => jobRow(p.tieu_de));
+  rows.forEach((r) => box.appendChild(r.el));
+  box.appendChild(stop);
+
+  const results = [];
+  let error = null;
+  for (const [i, part] of parts.entries()) {
+    try {
+      const r = await upgradeLesson({ sample: S.sample, opts: opts(), part, signal: S.ctl.signal, stage: (k, n) => rows[i].stage(k, n) });
+      results.push(r);
+      rows[i].finish(`${r.score.diem_100}/100`);
+    } catch (e) {
+      error = e;
+      rows[i].finish(e.code === 'cancelled' ? 'Đã dừng' : 'Lỗi', false);
+      break;
+    }
   }
-  const dl = document.createElement('div');
-  dl.className = 'dl';
-  const label = { 'KHBD_hoan_chinh.docx': 'Tải KHBD hoàn chỉnh (.docx)', 'Bao_cao_tham_dinh.docx': 'Tải báo cáo thẩm định (.docx)', 'KHBD.json': 'Dữ liệu .json' };
-  for (const [name, blob] of Object.entries(files)) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = name.endsWith('.json') ? 'ghost' : 'primary';
-    btn.textContent = label[name];
-    btn.addEventListener('click', () => save(name, blob, btn));
-    dl.appendChild(btn);
+  stop.remove();
+  if (results.length) {
+    S.blob = await buildDocx(results, S.images);
+    box.appendChild(resultPanel(results, error));
+  } else {
+    const p = document.createElement('p');
+    p.className = 'err';
+    p.textContent = error?.code === 'cancelled' ? 'Đã dừng. Bấm Nâng cấp KHBD để chạy lại.' : errMsg(error);
+    box.appendChild(p);
   }
-  box.appendChild(dl);
+  S.busy = false;
+  $('goRow').hidden = false;
+  $('run').textContent = results.length ? 'Nâng cấp lại' : 'Nâng cấp KHBD';
+  $('run').className = results.length ? 'btn quiet' : 'btn primary';
+  refresh();
 }
 
-async function save(name, blob, btn) {
-  if (!S.downloads) { btn.textContent = 'Chế độ xem này không cho tải file'; btn.disabled = true; return; }
-  try {
-    await S.downloads.save({ filename: name, data: blob });
-  } catch (e) {
-    if (e?.code === 'declined') return;
-    if (e?.code === 'rate_limited') { btn.title = 'Đang có hộp thoại lưu khác — thử lại sau giây lát.'; return; }
-    btn.textContent = 'Không tải được ở chế độ xem này';
+function resultPanel(results, error) {
+  const n = results.length;
+  const avg = Math.round(results.reduce((s, r) => s + r.score.diem_100, 0) / n);
+  const allPass = results.every((r) => !r.score.co_p1 && r.score.diem_100 >= 85);
+  const kiemTra = results.reduce((s, r) => s + r.khbd.can_cu_chuong_trinh.ghi_chu_can_kiem_tra.length, 0);
+  const conLai = results.flatMap((r) => [
+    ...r.validation.issues.filter((x) => x.muc_do !== 'P3').map((x) => `${n > 1 ? `${r.khbd.meta.ten_bai || r.part.tieu_de}: ` : ''}${x.van_de}`),
+  ]);
+  const el = document.createElement('div');
+  el.className = `result ${allPass ? '' : 'warn'}`;
+  el.innerHTML = `<div class="result-top">
+      <div class="score"><b>${avg}</b><small>/100</small></div>
+      <div class="verdict"><strong>${allPass ? 'KHBD đã đạt chuẩn thẩm định' : 'KHBD đã nâng cấp — còn vài điểm cần thầy cô xem lại'}</strong>
+        <span>${n} tiết · ${results.map((r) => `${r.score.xep_loai}`).join(', ')}${error ? ' · các tiết sau bị dừng giữa chừng' : ''}</span></div>
+    </div>
+    ${n === 1 ? breakdown(results[0]) : ''}
+    <div class="go"><button class="btn primary" type="button" id="dl">Tải KHBD hoàn chỉnh (.docx)</button></div>
+    ${kiemTra ? `<p class="note red">${kiemTra} chi tiết SGK cần thầy cô kiểm tra lại — đánh dấu đỏ ở phụ lục cuối file.</p>` : ''}
+    ${conLai.length ? `<details class="left"><summary>${conLai.length} điểm chưa hoàn toàn đạt</summary><ul>${conLai.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}`;
+  el.querySelector('#dl').addEventListener('click', (ev) => save(ev.currentTarget));
+  return el;
+}
+
+function breakdown(r) {
+  const s = r.score;
+  return `<dl class="rows">
+    <div><dt>Khung mẫu</dt><dd>${s.buoc1}/15</dd></div>
+    <div><dt>Yêu cầu cần đạt</dt><dd>${s.buoc23}/10</dd></div>
+    <div><dt>Mục tiêu ↔ hoạt động</dt><dd>${s.buoc5}/20</dd></div>
+    <div><dt>Tiêu chí chuyên môn</dt><dd>${s.buoc6.diem}/40</dd></div>
+    <div><dt>Active Learning · Giá trị & Thói quen</dt><dd>${s.buoc7}/15</dd></div>
+    <div><dt>Thời lượng học sinh hoạt động</dt><dd>${r.validation.thong_ke.ti_le_hs}%</dd></div>
+  </dl>`;
+}
+
+async function save(btn) {
+  if (!S.blob) return;
+  if (!S.downloads) {
     btn.disabled = true;
+    btn.textContent = 'Chế độ xem này không cho tải file';
+    return;
   }
-}
-
-// ───── mẫu có sẵn (không tốn lượt Claude) ─────
-async function showSample() {
-  $('progress').hidden = false;
-  $('log').innerHTML = '';
-  log('Mẫu: TA7 Unit 2 – Lesson 1 (nâng cấp theo Same/Different). Phần chấm Claude chưa chạy trên mẫu này nên điểm là tham khảo từ bộ kiểm tra quy tắc.', 'step');
-  const cfg = config();
-  const r = await runLesson({ sample: null, config: cfg, opts: {}, part: { so: 1, tieu_de: sampleKHBD.meta.ten_bai, text: '', khbd: sampleKHBD }, mode: 'nang_cap', log: () => {} });
-  showResults([r], await toDocx([r], [], cfg, 'nang_cap'));
-}
-
-// ───── cài đặt ─────
-function loadSettings() {
-  const s = settings();
-  const def = makeConfig().tieu_chi_trao_quyen.danh_sach.map((x) => x.ten);
-  const list = s.tieu_chi_trao_quyen || def;
-  $('tq').innerHTML = list.map((t, i) => `<li><input id="tq${i}" value="${esc(t)}" aria-label="Tiêu chí ${i + 1}"></li>`).join('');
-  $('tqState').textContent = s.tieu_chi_trao_quyen ? 'đang dùng danh sách bạn đã lưu' : 'danh sách TẠM (tài liệu nguồn chưa liệt kê 6 tiêu chí) — hãy thay bằng danh sách chính thức';
-  $('tqState').className = s.tieu_chi_trao_quyen ? 'muted' : 'warn';
-  $('cfgTarget').value = s.diem_muc_tieu;
-  $('cfgRounds').value = s.so_vong;
-  $('cfgTo').value = s.to_chuyen_mon || '';
-  if (!$('to_chuyen_mon').value) $('to_chuyen_mon').value = s.to_chuyen_mon || '';
-}
-function saveSettings() {
-  const tq = [0, 1, 2, 3, 4, 5].map((i) => $(`tq${i}`).value.trim());
-  if (tq.some((x) => !x)) { $('cfgMsg').textContent = 'Cần đủ 6 tiêu chí.'; return; }
-  const def = makeConfig().tieu_chi_trao_quyen.danh_sach.map((x) => x.ten);
-  store.set('khbd_settings', {
-    tieu_chi_trao_quyen: tq.join('|') === def.join('|') ? null : tq,
-    diem_muc_tieu: Math.max(70, Math.min(100, Number($('cfgTarget').value) || 88)),
-    so_vong: Math.max(0, Math.min(3, Number($('cfgRounds').value) || 0)),
-    to_chuyen_mon: $('cfgTo').value.trim(),
-  });
-  $('cfgMsg').textContent = 'Đã lưu trên trình duyệt này.';
-  loadSettings();
+  try {
+    await S.downloads.save({ filename: `KHBD_${S.fileName || 'hoan_chinh'}.docx`, data: S.blob });
+  } catch (e) {
+    if (e?.code === 'declined' || e?.code === 'rate_limited') return;
+    btn.disabled = true;
+    btn.textContent = 'Không tải được ở chế độ xem này';
+  }
 }
 
 // ───── khởi động ─────
-document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => setMode(t.dataset.mode)));
 $('file').addEventListener('change', (e) => e.target.files[0] && onFile(e.target.files[0]));
 const drop = $('drop');
 ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
 drop.addEventListener('drop', (e) => e.dataTransfer.files[0] && onFile(e.dataTransfer.files[0]));
-['mon_hoc', 'ten_bai'].forEach((id) => $(id).addEventListener('input', refresh));
-$('so_tiet').addEventListener('change', () => S.parts.length && renderLessons());
+$('selAll').addEventListener('click', () => {
+  const boxes = [...document.querySelectorAll('#lessons input')];
+  const all = boxes.every((b) => b.checked);
+  boxes.forEach((b) => { b.checked = !all; });
+  refresh();
+});
 $('run').addEventListener('click', run);
-$('stop').addEventListener('click', () => S.ctl?.abort());
-$('saveCfg').addEventListener('click', saveSettings);
-$('showSample').addEventListener('click', showSample);
-loadSettings();
-setMode('nang_cap');
-showSample();
+S.sample = undefined;
+refresh();
 
 (async () => {
-  const [sample, downloads] = await Promise.all([
-    window.claude?.use?.('sample') ?? Promise.resolve(null),
-    window.claude?.use?.('downloads') ?? Promise.resolve(null),
-  ]);
-  S.sample = sample;
-  S.downloads = downloads;
-  $('status').textContent = sample ? 'Claude sẵn sàng — dùng lượt Claude của chính bạn, hỏi xin phép ở lần chạy đầu' : 'Claude chưa dùng được ở chế độ xem này (cần mở trong claude.ai)';
-  $('status').className = `status ${sample ? 'good' : 'bad'}`;
+  const use = (n) => (window.claude?.use ? window.claude.use(n) : Promise.resolve(null));
+  [S.sample, S.downloads] = await Promise.all([use('sample'), use('downloads')]);
   refresh();
 })();

@@ -54,12 +54,15 @@ Rà soát sơ bộ bản gốc ─► Tra cứu web ─► Claude soạn/nâng c
 
 ## Bản web dùng ngay trên claude.ai (không cần cài đặt, không cần khoá API)
 
-Đã đăng tại **https://claude.ai/artifact/PXU57eEkBH4MhmBPATsWKh** (mặc định chỉ chủ sở hữu mở được — chia sẻ cho giáo viên trong tổ bằng menu **Share** của trang).
+**https://claude.ai/artifact/PXU57eEkBH4MhmBPATsWKh** — trang tinh gọn chỉ làm một việc: **nâng cấp giáo án thành KHBD hoàn chỉnh**.
 
-- Chạy hoàn toàn trong trình duyệt; gọi Claude qua tài khoản claude.ai của chính người dùng (lần chạy đầu sẽ hỏi cho phép), tải file Word về qua hộp thoại lưu của claude.ai.
-- Cùng bộ kiểm tra quy tắc, prompt, schema và bộ xuất Word với bản máy chủ; mỗi tiết gọi Claude 2 phần (mục tiêu – rubric – dàn ý, rồi tiến trình chi tiết) + 1 lần chấm, các vòng tự sửa chỉ gửi lại phần cần sửa.
-- Khác bản máy chủ: **không tra cứu web** (chi tiết SGK/YCCĐ chưa chắc chắn được đánh dấu đỏ để GV kiểm tra), chưa đọc PDF (lưu thành .docx), cài đặt 6 tiêu chí Trao quyền lưu trên trình duyệt từng máy.
-- Mã nguồn: `web-artifact/` · đóng gói lại: `npm run build:web` → `web-artifact/dist/`.
+1. Tải file giáo án `.docx` (một file có thể gồm nhiều tiết).
+2. Chọn tiết cần nâng cấp (mục *Tuỳ chọn* để chỉ định phương pháp, ngôn ngữ, tên GV… nếu muốn).
+3. Bấm **Nâng cấp KHBD** → tải về **một file Word KHBD hoàn chỉnh** (giữ ngữ liệu, bài tập, đáp án, hình ảnh gốc).
+
+Bên trong mỗi tiết: Claude soạn 2 phần (mục tiêu – rubric – dàn ý, rồi tiến trình) → bộ kiểm tra quy tắc + Claude chấm theo bảng điểm /100 → tự sửa phần còn lỗi (tối đa 2 vòng) đến khi ≥ 88/100 và không còn lỗi P1/P2. Claude chạy trên tài khoản claude.ai của người dùng; không tra cứu web, nên chi tiết SGK chưa chắc chắn được đánh dấu đỏ ở phụ lục cuối file.
+
+Mã nguồn: `web-artifact/` · đóng gói lại: `npm run build:web` → `web-artifact/dist/`.
 
 ## Cách dùng trên máy cá nhân (không cần máy chủ)
 
